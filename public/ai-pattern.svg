@@ -1,0 +1,506 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+  <defs>
+    <style>
+      .text { font-family: 'Courier New', monospace; font-size: 12px; fill: #ffffff; opacity: 0.1; }
+    </style>
+  </defs>
+  
+  <!-- Pattern de chiffres et lettres pour évoquer l'IA -->
+  <text x="50" y="30" class="text">01001001</text>
+  <text x="150" y="30" class="text">AI</text>
+  <text x="200" y="30" class="text">ML</text>
+  <text x="250" y="30" class="text">101101</text>
+  
+  <text x="50" y="60" class="text">neural</text>
+  <text x="120" y="60" class="text">0.87</text>
+  <text x="180" y="60" class="text">tensor</text>
+  <text x="250" y="60" class="text">42</text>
+  
+  <text x="50" y="90" class="text">01100001</text>
+  <text x="150" y="90" class="text">GPT</text>
+  <text x="200" y="90" class="text">3.5</text>
+  <text x="250" y="90" class="text">LLM</text>
+  
+  <text x="50" y="120" class="text">vector</text>
+  <text x="120" y="120" class="text">[1,0,1]</text>
+  <text x="200" y="120" class="text">epoch</text>
+  <text x="270" y="120" class="text">256</text>
+  
+  <text x="50" y="150" class="text">01000001</text>
+  <text x="150" y="150" class="text">deep</text>
+  <text x="200" y="150" class="text">0.92</text>
+  <text x="250" y="150" class="text">model</text>
+  
+  <text x="50" y="180" class="text">train</text>
+  <text x="100" y="180" class="text">loss</text>
+  <text x="150" y="180" class="text">0.001</text>
+  <text x="220" y="180" class="text">gradient</text>
+  
+  <text x="50" y="210" class="text">01101000</text>
+  <text x="150" y="210" class="text">CNN</text>
+  <text x="200" y="210" class="text">RNN</text>
+  <text x="250" y="210" class="text">LSTM</text>
+  
+  <text x="50" y="240" class="text">embed</text>
+  <text x="110" y="240" class="text">768</text>
+  <text x="160" y="240" class="text">dim</text>
+  <text x="200" y="240" class="text">0.85</text>
+  
+  <text x="50" y="270" class="text">01001000</text>
+  <text x="150" y="270" class="text">BERT</text>
+  <text x="200" y="270" class="text">transformer</text>
+  <text x="300" y="270" class="text">512</text>
+  
+  <text x="50" y="300" class="text">attention</text>
+  <text x="130" y="300" class="text">heads</text>
+  <text x="190" y="300" class="text">12</text>
+  <text x="220" y="300" class="text">layer</text>
+  
+  <text x="50" y="330" class="text">01100101</text>
+  <text x="150" y="330" class="text">prompt</text>
+  <text x="220" y="330" class="text">token</text>
+  <text x="280" y="330" class="text">2048</text>
+  
+  <text x="50" y="360" class="text">01001110</text>
+  <text x="150" y="360" class="text">diffusion</text>
+  <text x="240" y="360" class="text">noise</text>
+  <text x="300" y="360" class="text">0.02</text>
+  
+  <text x="50" y="390" class="text">latent</text>
+  <text x="110" y="390" class="text">space</text>
+  <text x="180" y="390" class="text">128</text>
+  <text x="220" y="390" class="text">dim</text>
+  
+  <text x="50" y="420" class="text">01101100</text>
+  <text x="150" y="420" class="text">GAN</text>
+  <text x="190" y="420" class="text">discrim</text>
+  <text x="260" y="420" class="text">gen</text>
+  
+  <text x="50" y="450" class="text">01001100</text>
+  <text x="150" y="450" class="text">backprop</text>
+  <text x="230" y="450" class="text">0.001</text>
+  <text x="280" y="450" class="text">lr</text>
+  
+  <text x="50" y="480" class="text">activation</text>
+  <text x="140" y="480" class="text">relu</text>
+  <text x="190" y="480" class="text">sigmoid</text>
+  <text x="260" y="480" class="text">tanh</text>
+  
+  <text x="50" y="510" class="text">01101101</text>
+  <text x="150" y="510" class="text">batch</text>
+  <text x="200" y="510" class="text">32</text>
+  <text x="230" y="510" class="text">dropout</text>
+  
+  <text x="50" y="540" class="text">01001101</text>
+  <text x="150" y="540" class="text">optimizer</text>
+  <text x="240" y="540" class="text">adam</text>
+  <text x="290" y="540" class="text">0.9</text>
+  
+  <text x="50" y="570" class="text">01101110</text>
+  <text x="150" y="570" class="text">feature</text>
+  <text x="210" y="570" class="text">extract</text>
+  <text x="280" y="570" class="text">1024</text>
+  
+  <text x="50" y="600" class="text">01001110</text>
+  <text x="150" y="600" class="text">classify</text>
+  <text x="220" y="600" class="text">softmax</text>
+  <text x="290" y="600" class="text">1000</text>
+  
+  <text x="50" y="630" class="text">01101111</text>
+  <text x="150" y="630" class="text">inference</text>
+  <text x="230" y="630" class="text">0.95</text>
+  <text x="280" y="630" class="text">conf</text>
+  
+  <text x="50" y="660" class="text">01001111</text>
+  <text x="150" y="660" class="text">encoder</text>
+  <text x="220" y="660" class="text">decoder</text>
+  <text x="300" y="660" class="text">512</text>
+  
+  <text x="50" y="690" class="text">01110000</text>
+  <text x="150" y="690" class="text">pooling</text>
+  <text x="220" y="690" class="text">max</text>
+  <text x="260" y="690" class="text">avg</text>
+  
+  <text x="50" y="720" class="text">01010000</text>
+  <text x="150" y="720" class="text">normalize</text>
+  <text x="230" y="720" class="text">std</text>
+  <text x="270" y="720" class="text">mean</text>
+  
+  <text x="50" y="750" class="text">01110001</text>
+  <text x="150" y="750" class="text">quantize</text>
+  <text x="230" y="750" class="text">int8</text>
+  <text x="280" y="750" class="text">fp16</text>
+  
+  <text x="50" y="780" class="text">01010001</text>
+  <text x="150" y="780" class="text">prune</text>
+  <text x="200" y="780" class="text">sparse</text>
+  <text x="260" y="780" class="text">0.5</text>
+  
+  <text x="50" y="810" class="text">01110010</text>
+  <text x="150" y="810" class="text">distill</text>
+  <text x="210" y="810" class="text">teacher</text>
+  <text x="280" y="810" class="text">student</text>
+  
+  <text x="50" y="840" class="text">01010010</text>
+  <text x="150" y="840" class="text">fine-tune</text>
+  <text x="230" y="840" class="text">adapt</text>
+  <text x="280" y="840" class="text">0.1</text>
+  
+  <text x="50" y="870" class="text">01110011</text>
+  <text x="150" y="870" class="text">evaluate</text>
+  <text x="230" y="870" class="text">f1</text>
+  <text x="260" y="870" class="text">0.88</text>
+  
+  <text x="50" y="900" class="text">01010011</text>
+  <text x="150" y="900" class="text">validate</text>
+  <text x="220" y="900" class="text">test</text>
+  <text x="260" y="900" class="text">split</text>
+  
+  <text x="50" y="930" class="text">01110100</text>
+  <text x="150" y="930" class="text">overfit</text>
+  <text x="220" y="930" class="text">regul</text>
+  <text x="270" y="930" class="text">0.01</text>
+  
+  <text x="50" y="960" class="text">01010100</text>
+  <text x="150" y="960" class="text">cross-val</text>
+  <text x="230" y="960" class="text">k-fold</text>
+  <text x="290" y="960" class="text">5</text>
+  
+  <text x="50" y="990" class="text">01110101</text>
+  <text x="150" y="990" class="text">ensemble</text>
+  <text x="230" y="990" class="text">vote</text>
+  <text x="270" y="990" class="text">0.94</text>
+  
+  <!-- Répétition du pattern pour remplir l'espace -->
+  <text x="400" y="30" class="text">01001001</text>
+  <text x="500" y="30" class="text">AI</text>
+  <text x="550" y="30" class="text">ML</text>
+  <text x="600" y="30" class="text">101101</text>
+  
+  <text x="400" y="60" class="text">neural</text>
+  <text x="470" y="60" class="text">0.87</text>
+  <text x="530" y="60" class="text">tensor</text>
+  <text x="600" y="60" class="text">42</text>
+  
+  <text x="400" y="90" class="text">01100001</text>
+  <text x="500" y="90" class="text">GPT</text>
+  <text x="550" y="90" class="text">3.5</text>
+  <text x="600" y="90" class="text">LLM</text>
+  
+  <text x="400" y="120" class="text">vector</text>
+  <text x="470" y="120" class="text">[1,0,1]</text>
+  <text x="550" y="120" class="text">epoch</text>
+  <text x="620" y="120" class="text">256</text>
+  
+  <text x="400" y="150" class="text">01000001</text>
+  <text x="500" y="150" class="text">deep</text>
+  <text x="550" y="150" class="text">0.92</text>
+  <text x="600" y="150" class="text">model</text>
+  
+  <text x="400" y="180" class="text">train</text>
+  <text x="450" y="180" class="text">loss</text>
+  <text x="500" y="180" class="text">0.001</text>
+  <text x="570" y="180" class="text">gradient</text>
+  
+  <text x="400" y="210" class="text">01101000</text>
+  <text x="500" y="210" class="text">CNN</text>
+  <text x="550" y="210" class="text">RNN</text>
+  <text x="600" y="210" class="text">LSTM</text>
+  
+  <text x="400" y="240" class="text">embed</text>
+  <text x="460" y="240" class="text">768</text>
+  <text x="510" y="240" class="text">dim</text>
+  <text x="550" y="240" class="text">0.85</text>
+  
+  <text x="400" y="270" class="text">01001000</text>
+  <text x="500" y="270" class="text">BERT</text>
+  <text x="550" y="270" class="text">transformer</text>
+  <text x="650" y="270" class="text">512</text>
+  
+  <text x="400" y="300" class="text">attention</text>
+  <text x="480" y="300" class="text">heads</text>
+  <text x="540" y="300" class="text">12</text>
+  <text x="570" y="300" class="text">layer</text>
+  
+  <text x="400" y="330" class="text">01100101</text>
+  <text x="500" y="330" class="text">prompt</text>
+  <text x="570" y="330" class="text">token</text>
+  <text x="630" y="330" class="text">2048</text>
+  
+  <text x="400" y="360" class="text">01001110</text>
+  <text x="500" y="360" class="text">diffusion</text>
+  <text x="590" y="360" class="text">noise</text>
+  <text x="650" y="360" class="text">0.02</text>
+  
+  <text x="400" y="390" class="text">latent</text>
+  <text x="460" y="390" class="text">space</text>
+  <text x="530" y="390" class="text">128</text>
+  <text x="570" y="390" class="text">dim</text>
+  
+  <text x="400" y="420" class="text">01101100</text>
+  <text x="500" y="420" class="text">GAN</text>
+  <text x="540" y="420" class="text">discrim</text>
+  <text x="610" y="420" class="text">gen</text>
+  
+  <text x="400" y="450" class="text">01001100</text>
+  <text x="500" y="450" class="text">backprop</text>
+  <text x="580" y="450" class="text">0.001</text>
+  <text x="630" y="450" class="text">lr</text>
+  
+  <text x="400" y="480" class="text">activation</text>
+  <text x="490" y="480" class="text">relu</text>
+  <text x="540" y="480" class="text">sigmoid</text>
+  <text x="610" y="480" class="text">tanh</text>
+  
+  <text x="400" y="510" class="text">01101101</text>
+  <text x="500" y="510" class="text">batch</text>
+  <text x="550" y="510" class="text">32</text>
+  <text x="580" y="510" class="text">dropout</text>
+  
+  <text x="400" y="540" class="text">01001101</text>
+  <text x="500" y="540" class="text">optimizer</text>
+  <text x="590" y="540" class="text">adam</text>
+  <text x="640" y="540" class="text">0.9</text>
+  
+  <text x="400" y="570" class="text">01101110</text>
+  <text x="500" y="570" class="text">feature</text>
+  <text x="560" y="570" class="text">extract</text>
+  <text x="630" y="570" class="text">1024</text>
+  
+  <text x="400" y="600" class="text">01001110</text>
+  <text x="500" y="600" class="text">classify</text>
+  <text x="570" y="600" class="text">softmax</text>
+  <text x="640" y="600" class="text">1000</text>
+  
+  <text x="400" y="630" class="text">01101111</text>
+  <text x="500" y="630" class="text">inference</text>
+  <text x="580" y="630" class="text">0.95</text>
+  <text x="630" y="630" class="text">conf</text>
+  
+  <text x="400" y="660" class="text">01001111</text>
+  <text x="500" y="660" class="text">encoder</text>
+  <text x="570" y="660" class="text">decoder</text>
+  <text x="650" y="660" class="text">512</text>
+  
+  <text x="400" y="690" class="text">01110000</text>
+  <text x="500" y="690" class="text">pooling</text>
+  <text x="570" y="690" class="text">max</text>
+  <text x="610" y="690" class="text">avg</text>
+  
+  <text x="400" y="720" class="text">01010000</text>
+  <text x="500" y="720" class="text">normalize</text>
+  <text x="580" y="720" class="text">std</text>
+  <text x="620" y="720" class="text">mean</text>
+  
+  <text x="400" y="750" class="text">01110001</text>
+  <text x="500" y="750" class="text">quantize</text>
+  <text x="580" y="750" class="text">int8</text>
+  <text x="630" y="750" class="text">fp16</text>
+  
+  <text x="400" y="780" class="text">01010001</text>
+  <text x="500" y="780" class="text">prune</text>
+  <text x="550" y="780" class="text">sparse</text>
+  <text x="610" y="780" class="text">0.5</text>
+  
+  <text x="400" y="810" class="text">01110010</text>
+  <text x="500" y="810" class="text">distill</text>
+  <text x="560" y="810" class="text">teacher</text>
+  <text x="630" y="810" class="text">student</text>
+  
+  <text x="400" y="840" class="text">01010010</text>
+  <text x="500" y="840" class="text">fine-tune</text>
+  <text x="580" y="840" class="text">adapt</text>
+  <text x="630" y="840" class="text">0.1</text>
+  
+  <text x="400" y="870" class="text">01110011</text>
+  <text x="500" y="870" class="text">evaluate</text>
+  <text x="580" y="870" class="text">f1</text>
+  <text x="610" y="870" class="text">0.88</text>
+  
+  <text x="400" y="900" class="text">01010011</text>
+  <text x="500" y="900" class="text">validate</text>
+  <text x="570" y="900" class="text">test</text>
+  <text x="610" y="900" class="text">split</text>
+  
+  <text x="400" y="930" class="text">01110100</text>
+  <text x="500" y="930" class="text">overfit</text>
+  <text x="570" y="930" class="text">regul</text>
+  <text x="620" y="930" class="text">0.01</text>
+  
+  <text x="400" y="960" class="text">01010100</text>
+  <text x="500" y="960" class="text">cross-val</text>
+  <text x="580" y="960" class="text">k-fold</text>
+  <text x="640" y="960" class="text">5</text>
+  
+  <text x="400" y="990" class="text">01110101</text>
+  <text x="500" y="990" class="text">ensemble</text>
+  <text x="580" y="990" class="text">vote</text>
+  <text x="620" y="990" class="text">0.94</text>
+  
+  <!-- Troisième colonne -->
+  <text x="750" y="30" class="text">01001001</text>
+  <text x="850" y="30" class="text">AI</text>
+  <text x="900" y="30" class="text">ML</text>
+  <text x="950" y="30" class="text">101101</text>
+  
+  <text x="750" y="60" class="text">neural</text>
+  <text x="820" y="60" class="text">0.87</text>
+  <text x="880" y="60" class="text">tensor</text>
+  <text x="950" y="60" class="text">42</text>
+  
+  <text x="750" y="90" class="text">01100001</text>
+  <text x="850" y="90" class="text">GPT</text>
+  <text x="900" y="90" class="text">3.5</text>
+  <text x="950" y="90" class="text">LLM</text>
+  
+  <text x="750" y="120" class="text">vector</text>
+  <text x="820" y="120" class="text">[1,0,1]</text>
+  <text x="900" y="120" class="text">epoch</text>
+  <text x="970" y="120" class="text">256</text>
+  
+  <text x="750" y="150" class="text">01000001</text>
+  <text x="850" y="150" class="text">deep</text>
+  <text x="900" y="150" class="text">0.92</text>
+  <text x="950" y="150" class="text">model</text>
+  
+  <text x="750" y="180" class="text">train</text>
+  <text x="800" y="180" class="text">loss</text>
+  <text x="850" y="180" class="text">0.001</text>
+  <text x="920" y="180" class="text">gradient</text>
+  
+  <text x="750" y="210" class="text">01101000</text>
+  <text x="850" y="210" class="text">CNN</text>
+  <text x="900" y="210" class="text">RNN</text>
+  <text x="950" y="210" class="text">LSTM</text>
+  
+  <text x="750" y="240" class="text">embed</text>
+  <text x="810" y="240" class="text">768</text>
+  <text x="860" y="240" class="text">dim</text>
+  <text x="900" y="240" class="text">0.85</text>
+  
+  <text x="750" y="270" class="text">01001000</text>
+  <text x="850" y="270" class="text">BERT</text>
+  <text x="900" y="270" class="text">transformer</text>
+  <text x="1000" y="270" class="text">512</text>
+  
+  <text x="750" y="300" class="text">attention</text>
+  <text x="830" y="300" class="text">heads</text>
+  <text x="890" y="300" class="text">12</text>
+  <text x="920" y="300" class="text">layer</text>
+  
+  <text x="750" y="330" class="text">01100101</text>
+  <text x="850" y="330" class="text">prompt</text>
+  <text x="920" y="330" class="text">token</text>
+  <text x="980" y="330" class="text">2048</text>
+  
+  <text x="750" y="360" class="text">01001110</text>
+  <text x="850" y="360" class="text">diffusion</text>
+  <text x="940" y="360" class="text">noise</text>
+  <text x="1000" y="360" class="text">0.02</text>
+  
+  <text x="750" y="390" class="text">latent</text>
+  <text x="810" y="390" class="text">space</text>
+  <text x="880" y="390" class="text">128</text>
+  <text x="920" y="390" class="text">dim</text>
+  
+  <text x="750" y="420" class="text">01101100</text>
+  <text x="850" y="420" class="text">GAN</text>
+  <text x="890" y="420" class="text">discrim</text>
+  <text x="960" y="420" class="text">gen</text>
+  
+  <text x="750" y="450" class="text">01001100</text>
+  <text x="850" y="450" class="text">backprop</text>
+  <text x="930" y="450" class="text">0.001</text>
+  <text x="980" y="450" class="text">lr</text>
+  
+  <text x="750" y="480" class="text">activation</text>
+  <text x="840" y="480" class="text">relu</text>
+  <text x="890" y="480" class="text">sigmoid</text>
+  <text x="960" y="480" class="text">tanh</text>
+  
+  <text x="750" y="510" class="text">01101101</text>
+  <text x="850" y="510" class="text">batch</text>
+  <text x="900" y="510" class="text">32</text>
+  <text x="930" y="510" class="text">dropout</text>
+  
+  <text x="750" y="540" class="text">01001101</text>
+  <text x="850" y="540" class="text">optimizer</text>
+  <text x="940" y="540" class="text">adam</text>
+  <text x="990" y="540" class="text">0.9</text>
+  
+  <text x="750" y="570" class="text">01101110</text>
+  <text x="850" y="570" class="text">feature</text>
+  <text x="910" y="570" class="text">extract</text>
+  <text x="980" y="570" class="text">1024</text>
+  
+  <text x="750" y="600" class="text">01001110</text>
+  <text x="850" y="600" class="text">classify</text>
+  <text x="920" y="600" class="text">softmax</text>
+  <text x="990" y="600" class="text">1000</text>
+  
+  <text x="750" y="630" class="text">01101111</text>
+  <text x="850" y="630" class="text">inference</text>
+  <text x="930" y="630" class="text">0.95</text>
+  <text x="980" y="630" class="text">conf</text>
+  
+  <text x="750" y="660" class="text">01001111</text>
+  <text x="850" y="660" class="text">encoder</text>
+  <text x="920" y="660" class="text">decoder</text>
+  <text x="1000" y="660" class="text">512</text>
+  
+  <text x="750" y="690" class="text">01110000</text>
+  <text x="850" y="690" class="text">pooling</text>
+  <text x="920" y="690" class="text">max</text>
+  <text x="960" y="690" class="text">avg</text>
+  
+  <text x="750" y="720" class="text">01010000</text>
+  <text x="850" y="720" class="text">normalize</text>
+  <text x="930" y="720" class="text">std</text>
+  <text x="970" y="720" class="text">mean</text>
+  
+  <text x="750" y="750" class="text">01110001</text>
+  <text x="850" y="750" class="text">quantize</text>
+  <text x="930" y="750" class="text">int8</text>
+  <text x="980" y="750" class="text">fp16</text>
+  
+  <text x="750" y="780" class="text">01010001</text>
+  <text x="850" y="780" class="text">prune</text>
+  <text x="900" y="780" class="text">sparse</text>
+  <text x="960" y="780" class="text">0.5</text>
+  
+  <text x="750" y="810" class="text">01110010</text>
+  <text x="850" y="810" class="text">distill</text>
+  <text x="910" y="810" class="text">teacher</text>
+  <text x="980" y="810" class="text">student</text>
+  
+  <text x="750" y="840" class="text">01010010</text>
+  <text x="850" y="840" class="text">fine-tune</text>
+  <text x="930" y="840" class="text">adapt</text>
+  <text x="980" y="840" class="text">0.1</text>
+  
+  <text x="750" y="870" class="text">01110011</text>
+  <text x="850" y="870" class="text">evaluate</text>
+  <text x="930" y="870" class="text">f1</text>
+  <text x="960" y="870" class="text">0.88</text>
+  
+  <text x="750" y="900" class="text">01010011</text>
+  <text x="850" y="900" class="text">validate</text>
+  <text x="920" y="900" class="text">test</text>
+  <text x="960" y="900" class="text">split</text>
+  
+  <text x="750" y="930" class="text">01110100</text>
+  <text x="850" y="930" class="text">overfit</text>
+  <text x="920" y="930" class="text">regul</text>
+  <text x="970" y="930" class="text">0.01</text>
+  
+  <text x="750" y="960" class="text">01010100</text>
+  <text x="850" y="960" class="text">cross-val</text>
+  <text x="930" y="960" class="text">k-fold</text>
+  <text x="990" y="960" class="text">5</text>
+  
+  <text x="750" y="990" class="text">01110101</text>
+  <text x="850" y="990" class="text">ensemble</text>
+  <text x="930" y="990" class="text">vote</text>
+  <text x="970" y="990" class="text">0.94</text>
+</svg>
+

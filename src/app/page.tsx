@@ -3,15 +3,18 @@
 import Image from "next/image";
 import dynamic from 'next/dynamic';
 
-// Import dynamique du shader pour éviter les erreurs SSR
-const LiquidMetal = dynamic(() => import('@paper-design/shaders-react').then(mod => mod.LiquidMetal), {
-  ssr: false,
-});
+import { LiquidMetal } from '@paper-design/shaders-react';
+import { SimplexNoise } from '@paper-design/shaders-react';
+
+
 
 export default function Home() {
   return (
-    <main className="relative flex h-screen w-full flex-col items-center justify-center bg-black text-foreground overflow-hidden">
+    <main className="relative flex h-screen w-full flex-col items-center justify-center bg-[#2f2235] text-foreground overflow-hidden">
       <div className="absolute inset-0 z-0">
+
+
+{/* 
         <LiquidMetal
           // image="/sublimeV1.svg"
           width="100%"
@@ -24,17 +27,33 @@ export default function Home() {
           shiftRed={-0.4}
           shiftBlue={0.4}
           distortion={0.2}
-          contour={0.4}
-          angle={135}
-          speed={0.5}
+          contour={0.1}
+          angle={200}
+          speed={1}
           scale={0.12}
           fit="cover"
-        />
+        /> */}
+
+
+
+<SimplexNoise
+          width="100%"
+          height="100%"
+          colors={["#2f2235", "#3f3244", "#60495a", "#a9aca9", "#bfc3ba"]}
+          stepsPerColor={3}
+          softness={1}
+          speed={1}
+          scale={1}
+/>
+
       </div>
+
+
+      
       
       <div className="relative z-10 flex h-full flex-col items-center justify-end pb-24 pointer-events-none">
         <div className="flex items-center justify-center"></div>
-          <Image src="/sublimeV1.svg" alt="Sublime Agency Logo" width={300} height={100} className="invert" />
+          <Image src="/sublimeV1.svg" alt="Sublime Agency Logo" width={150} height={100} className="invert" />
           <h1 className="text-sm font-light tracking-wider mix-blend-difference text-white opacity-80 pt-6">
             heaven.paris ai studio 
           </h1>
