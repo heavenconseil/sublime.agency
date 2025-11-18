@@ -165,6 +165,7 @@ export default function Home() {
         />
       </div>
 
+
       {/* Main Wrapper épinglé */}
       <div ref={wrapperRef} className="relative z-20 w-full h-screen overflow-hidden">
         
