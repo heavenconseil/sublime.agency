@@ -1,272 +1,264 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SimplexNoise } from '@paper-design/shaders-react';
+import { useState, useEffect, useRef, useCallback } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
+// Hook simple pour l'effet machine à écrire
+function useTypewriter(text: string, speed: number = 50, onType?: () => void, onComplete?: () => void) {
+  const [displayedText, setDisplayedText] = useState("");
+  const lastLength = useRef(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  useEffect(() => {
+    setDisplayedText("");
+    setCurrentIndex(0);
+    lastLength.current = 0;
+  }, [text]); // Reset complet si le texte change
 
-const services = [
-  { 
-    title: "Generative media", 
-    desc: [
-      "Crafting unseen visual narratives.",
-      "High-fidelity AI video & imagery designed to elevate brand aesthetics."
-    ]
-  },
-  { 
-    title: "Social intelligence", 
-    desc: [
-      "Decoding cultural signals.",
-      "Advanced data analysis to predict trends and align strategy with audience pulse."
-    ]
-  },
-  { 
-    title: "Next-gen SEO", 
-    desc: [
-      "Dominating the new search landscape.",
-      "GEO & LLM optimization to ensure visibility in an AI-first world."
-    ]
-  },
-  { 
-    title: "Automated systems", 
-    desc: [
-      "Streamlining creativity.",
-      "Bespoke workflows and automation to scale operations without compromising quality."
-    ]
-  },
-  // Duplication pour effet de boucle
-  { 
-    title: "Generative media", 
-    desc: [
-      "Crafting unseen visual narratives.",
-      "High-fidelity AI video & imagery designed to elevate brand aesthetics."
-    ]
-  },
-  { 
-    title: "Social intelligence", 
-    desc: [
-      "Decoding cultural signals.",
-      "Advanced data analysis to predict trends and align strategy with audience pulse."
-    ]
-  },
-  { 
-    title: "Next-gen SEO", 
-    desc: [
-      "Dominating the new search landscape.",
-      "GEO & LLM optimization to ensure visibility in an AI-first world."
-    ]
-  },
-];
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeoutId = setTimeout(() => {
+        const nextIndex = currentIndex + 1;
+        setDisplayedText(text.substring(0, nextIndex));
+        setCurrentIndex(nextIndex);
+
+        // Logique de son (si onType existait)
+        if (onType) onType();
+
+        if (nextIndex >= text.length) {
+          if (onComplete) onComplete();
+        }
+      }, speed);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentIndex, text, speed, onType, onComplete]);
+
+  return displayedText;
+}
+
+// Fonction utilitaire pour calculer la luminance
+function getLuminance(hex: string) {
+  const c = hex.substring(1);      // strip #
+  const rgb = parseInt(c, 16);   // convert rrggbb to decimal
+  const r = (rgb >> 16) & 0xff;  // extract red
+  const g = (rgb >>  8) & 0xff;  // extract green
+  const b = (rgb >>  0) & 0xff;  // extract blue
+
+  // Formule standard de luminance relative (perçue)
+  // 0.2126 R + 0.7152 G + 0.0722 B
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+// Fonction pour déterminer si le texte doit être noir ou blanc
+function getTextColor(colors: string[]) {
+  if (!colors || colors.length === 0) return "text-white";
+  
+  // Moyenne des luminances
+  let totalLuminance = 0;
+  colors.forEach(c => totalLuminance += getLuminance(c));
+  const avgLuminance = totalLuminance / colors.length;
+  
+  // Seuil (128 est la moitié de 255, on ajuste souvent autour de 140-150 pour le confort)
+  return avgLuminance > 140 ? "text-black" : "text-white";
+}
 
 export default function Home() {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const logoContainerRef = useRef<HTMLDivElement>(null);
-  const servicesContainerRef = useRef<HTMLDivElement>(null);
+  // États séparés
+  const [phrase, setPhrase] = useState("Initialisation...");
+  const [colors, setColors] = useState(["#2f2235", "#3f3244", "#60495a", "#a9aca9", "#bfc3ba"]);
+  // État dérivé pour la couleur du texte/logo
+  const [textColorClass, setTextColorClass] = useState("text-white");
+  const [isDarkContent, setIsDarkContent] = useState(false);
 
-  useGSAP(() => {
-    // 0. SETUP INITIAL
-    gsap.set(servicesContainerRef.current, { y: "150vh", opacity: 0 });
+  const [simParams, setSimParams] = useState({ speed: 1, softness: 1, stepsPerColor: 3 });
+  
+  // Muted par défaut
+  const [isMuted, setIsMuted] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // État pour le clignotement
+  const [isBlinking, setIsBlinking] = useState(false);
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: wrapperRef.current,
-        start: "top top",
-        end: "+=600%", // Augmenté pour accommoder le formulaire
-        pin: true,
-        scrub: 1,
-      }
-    });
+  const playTypingSound = () => {
+    if (audioRef.current) {
+        // Logique de son de frappe si nécessaire, 
+        // mais ici on utilise le son de fond 01.mp3 qui est une ambiance.
+        // Si vous voulez un son de frappe en plus, il faudrait un 2ème élément audio.
+        // Pour l'instant, je laisse vide ou je réintègre la logique si vous avez le fichier type.mp3
+    }
+  };
 
-    // 1. Le logo se déplace vers la gauche
-    tl.to(logoContainerRef.current, {
-      left: "0%", 
-      width: "50%", 
-      duration: 1,
-      ease: "power2.inOut"
-    });
+  // Utiliser useCallback pour éviter que la fonction change à chaque rendu
+  const handleTypingComplete = useCallback(() => {
+    setIsBlinking(true);
+  }, []);
 
-    // 2. Apparition du logo Hopscotch
-    tl.to(".hopscotch-logo", {
-        opacity: 0.8,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.out"
-    }, "-=0.2");
+  const displayedPhrase = useTypewriter(phrase, 60, playTypingSound, handleTypingComplete);
+  const mounted = useRef(false);
+  // État pour l'opacité du bruit (pour transition douce)
+  const [noiseOpacity, setNoiseOpacity] = useState(1);
 
-    // 3. APPARITION DU CONTENEUR SERVICES
-    tl.to(servicesContainerRef.current, 
-      { opacity: 1, duration: 0.5, ease: "power1.in" }, 
-      "<" 
-    );
-
-    // 4. MOUVEMENT DU CONTENEUR
-    tl.to(servicesContainerRef.current, 
-      { y: "-350%", duration: 8, ease: "none" }, // Augmenté pour scroller jusqu'au bout du formulaire
-      "<" 
-    );
-
-    // 5. Gestion de l'opacité "Spotlight"
-    const updateOpacity = () => {
-      const center = window.innerHeight / 2;
-      const items = document.querySelectorAll(".service-item");
-      
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(center - itemCenter);
-        
-        let opacity;
-        
-        if (distance < 200) {
-            opacity = 1;
-        } else {
-            opacity = 1 - ((distance - 200) / 300);
+  useEffect(() => {
+    const playAudio = async () => {
+        if (audioRef.current) {
+            audioRef.current.volume = 0.5;
+            try {
+                if (!isMuted) {
+                    await audioRef.current.play();
+                } else {
+                    audioRef.current.pause();
+                }
+            } catch (err) {
+                console.log("Audio playback error:", err);
+            }
         }
+    };
+    playAudio();
+  }, [isMuted]);
+
+  useEffect(() => {
+    mounted.current = true;
+    let colorTimeout: NodeJS.Timeout;
+
+    const fetchNewTheme = async () => {
+      try {
+        // Arrêter le clignotement avant de commencer une nouvelle phrase
+        setIsBlinking(false);
         
-        opacity = Math.max(0.1, Math.min(1, opacity));
+        const res = await fetch('/api/generate-theme');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
         
-        const scale = 0.9 + (opacity * 0.15); 
-        const blurAmount = opacity === 1 ? 0 : (1 - opacity) * 5;
-        
-        gsap.set(item, { 
-            opacity: opacity, 
-            scale: scale, 
-            filter: blurAmount > 0 ? `blur(${blurAmount}px)` : "none",
-            zIndex: opacity === 1 ? 100 : 10 
-        });
-      });
+        if (mounted.current) {
+            // 1. Lance l'écriture de la nouvelle phrase
+            setPhrase(data.phrase);
+
+            // 2. Calcule la durée de l'écriture pour changer les couleurs à la fin
+            const typingDuration = data.phrase.length * 60; // 60ms par char
+            
+            // Nettoyer le timeout précédent s'il existe
+            if (colorTimeout) clearTimeout(colorTimeout);
+
+            colorTimeout = setTimeout(() => {
+                if (mounted.current) {
+                    // Petit effet de transition sur le noise
+                    setNoiseOpacity(0);
+                    setTimeout(() => {
+                        setColors(data.colors);
+                        
+                        // Calculer la nouvelle couleur de texte
+                        const newTextColor = getTextColor(data.colors);
+                        setTextColorClass(newTextColor);
+                        setIsDarkContent(newTextColor === "text-black");
+
+                        setSimParams({
+                            speed: data.speed,
+                            softness: data.softness,
+                            stepsPerColor: data.stepsPerColor
+                        });
+                        setNoiseOpacity(1);
+                    }, 500); // Changement de couleur pendant que l'opacité est basse
+                }
+            }, typingDuration + 200); // +200ms de pause après la fin
+        }
+      } catch (error) {
+        console.error("Error fetching theme:", error);
+      }
     };
 
-    gsap.ticker.add(updateOpacity);
+    // Premier appel rapide après 2s
+    const initialTimer = setTimeout(fetchNewTheme, 2000);
+
+    // Ensuite toutes les 12 secondes
+    const interval = setInterval(fetchNewTheme, 12000);
 
     return () => {
-      gsap.ticker.remove(updateOpacity);
+        mounted.current = false;
+        clearTimeout(initialTimer);
+        clearInterval(interval);
+        if (colorTimeout) clearTimeout(colorTimeout);
     };
-
-  }, { scope: wrapperRef });
+  }, []);
 
   return (
-    <main className="relative w-full bg-[#2f2235] text-foreground overflow-x-hidden">
+    <main className="relative w-full bg-black text-foreground overflow-x-hidden transition-colors duration-1000">
       
       {/* Fond Fixe SimplexNoise */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-[2000ms] ease-in-out"
+        style={{ opacity: noiseOpacity }}
+      >
         <SimplexNoise
           width="100%"
           height="100%"
-          colors={["#2f2235", "#3f3244", "#60495a", "#a9aca9", "#bfc3ba"]}
-          stepsPerColor={3}
-          softness={1}
-          speed={1}
+          colors={colors}
+          stepsPerColor={simParams.stepsPerColor}
+          softness={simParams.softness}
+          speed={simParams.speed}
           scale={1}
         />
       </div>
 
-
-      {/* Main Wrapper épinglé */}
-      <div ref={wrapperRef} className="relative z-20 w-full h-screen overflow-hidden">
+      {/* Main Wrapper */}
+      <div className="relative z-20 w-full h-screen overflow-hidden flex items-center justify-center">
         
+        {/* Background Audio */}
+        <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
+
+        {/* Sound Toggle Button */}
+        <button 
+          onClick={() => setIsMuted(!isMuted)}
+          className={`absolute top-8 right-8 z-50 mix-blend-difference opacity-50 hover:opacity-100 transition-opacity ${textColorClass}`}
+          aria-label={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+              <path d="M9 9v6a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+              <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          )}
+        </button>
+
         {/* LOGO ZONE */}
-        <div ref={logoContainerRef} className="absolute inset-0 z-20 flex flex-col items-center justify-center">
-           <div className="flex flex-col items-center transform transition-transform duration-700">
+        <div className="flex flex-col items-center justify-center space-y-8">
+          
+          {/* Logo */}
+          <div className="relative">
              <Image 
-              src="/sublimeV1.svg" 
-              alt="Sublime Agency Logo" 
-              width={250} 
-              height={160} 
-              className="invert w-48 md:w-72" 
-              priority
-            />
-            <h1 className="mt-6 text-xs font-mono mix-blend-difference text-white text-center">
-               heaven.paris ai studio
-            </h1>
+                src="/sublimeV1.svg" 
+                alt="Sublime Agency Logo" 
+                width={250} 
+                height={160} 
+                className={`w-48 md:w-72 transition-all duration-1000 ${isDarkContent ? '' : 'invert mix-blend-difference'}`} 
+                priority
+              />
+              <h1 className={`mt-6 text-xs font-mono text-center opacity-50 transition-colors duration-1000 ${textColorClass}`}>
+                  premium AI studio 
+              </h1>
+          </div>
 
-            {/* HOPSCOTCH LOGO */}
-            <div className="hopscotch-logo mt-8 opacity-0 translate-y-4">
-                  <Image 
-                      src="/Hopscotch_square_tab_black.png" 
-                      alt="Hopscotch Groupe" 
-                      width={40} 
-                      height={40} 
-                      className="invert" 
-                  />
-            </div>
-           </div>
-        </div>
+          {/* Dynamic AI Prompt Display */}
+          <div className="h-8 flex items-center justify-center">
+             <p className={`font-mono text-sm md:text-base text-center max-w-md px-4 transition-colors duration-1000 ${textColorClass} ${isBlinking ? 'animate-pulse' : ''}`}>
+                <span className="opacity-50 mr-2">{">"}</span>
+                {displayedPhrase}
+                <span className="animate-pulse ml-1">_</span>
+             </p>
+          </div>
 
-        {/* SERVICES ZONE */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 z-30 h-full flex items-center justify-center">
-            <div ref={servicesContainerRef} className="flex flex-col gap-48 w-full max-w-3xl px-12 opacity-0 translate-y-[150vh]">
-                {services.map((service, index) => (
-                    <div key={index} className="service-item flex flex-col text-left space-y-6 p-4 rounded-2xl origin-center will-change-transform">
-                        <h2 className="text-4xl md:text-7xl font-black text-white leading-tight wrap-break-word">
-                            {service.title}
-                        </h2>
-                        <ul className="space-y-3">
-                          {service.desc.map((line, i) => (
-                            <li key={i} className="text-sm font-mono font-light leading-relaxed tracking-wide flex items-start">
-                              <span className="mr-3 mt-1 text-white/40 text-[10px]">●</span>
-                              <span>{line}</span>
-                            </li>
-                          ))}
-                        </ul>
-                    </div>
-                ))}
-
-                {/* CONTACT FORM BLOCK */}
-                <div className="service-item flex flex-col text-left space-y-8 p-4 rounded-2xl origin-center will-change-transform min-h-[40vh] justify-center">
-                    <h2 className="text-4xl md:text-6xl font-black text-white leading-tight wrap-break-word mb-8">
-                        keep in touch bro
-                    </h2>
-                    
-                    <form className="w-full space-y-10">
-                        <div className="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-12 border-b border-white/20 pb-2 relative group">
-                            <label htmlFor="name" className="text-xs font-mono text-white/50 w-16 shrink-0 uppercase tracking-widest group-hover:text-white transition-colors">name</label>
-                            <input 
-                                type="text" 
-                                id="name"
-                                className="bg-transparent w-full text-xl md:text-3xl text-white focus:outline-none placeholder:text-white/5 font-light pb-2"
-                                placeholder="John Doe"
-                            />
-                        </div>
-
-                        <div className="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-12 border-b border-white/20 pb-2 relative group">
-                            <label htmlFor="email" className="text-xs font-mono text-white/50 w-16 shrink-0 uppercase tracking-widest group-hover:text-white transition-colors">email</label>
-                            <input 
-                                type="email" 
-                                id="email"
-                                className="bg-transparent w-full text-xl md:text-3xl text-white focus:outline-none placeholder:text-white/5 font-light pb-2"
-                                placeholder="john@heaven.paris"
-                            />
-                        </div>
-
-                        <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-12 border-b border-white/20 pb-2 relative group">
-                            <label htmlFor="message" className="text-xs font-mono text-white/50 w-16 shrink-0 uppercase tracking-widest mt-2 group-hover:text-white transition-colors">message</label>
-                            <textarea 
-                                id="message"
-                                rows={2}
-                                className="bg-transparent w-full text-xl md:text-3xl text-white focus:outline-none placeholder:text-white/5 font-light resize-none"
-                                placeholder="Let's build..."
-                            />
-                        </div>
-
-                        <div className="pt-4">
-                            <button type="submit" className="px-8 py-4 border border-white/20 rounded-full text-xs font-mono hover:bg-white hover:text-black hover:border-white transition-all duration-500 uppercase tracking-[0.2em]">
-                                Send it
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-            </div>
         </div>
 
       </div>
-      
-      <div className="h-[50vh] w-full"></div>
     </main>
   );
 }
