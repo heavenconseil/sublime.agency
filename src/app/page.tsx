@@ -183,7 +183,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative w-full bg-black text-foreground overflow-x-hidden transition-colors duration-1000">
+    <main className="relative w-full h-screen bg-black text-foreground overflow-hidden transition-colors duration-1000">
       
       {/* Fond Fixe SimplexNoise */}
       <div 
@@ -248,7 +248,7 @@ export default function Home() {
           </div>
 
           {/* Dynamic AI Prompt Display */}
-          <div className="h-8 flex items-center justify-center">
+          <div className="absolute bottom-12 left-0 right-0 flex items-center justify-center h-8">
              <p className={`font-mono text-sm md:text-base text-center max-w-md px-4 transition-colors duration-1000 ${textColorClass} ${isBlinking ? 'animate-pulse' : ''}`}>
                 <span className="opacity-50 mr-2">{">"}</span>
                 {displayedPhrase}
