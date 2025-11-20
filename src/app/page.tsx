@@ -64,6 +64,30 @@ function getTextColor(colors: string[]) {
   return avgLuminance > 140 ? "text-black" : "text-white";
 }
 
+// Composant Timer
+function Timer({ textColorClass }: { textColorClass: string }) {
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime((t) => t + 10); // +10ms
+    }, 10);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (ms: number) => {
+    const seconds = Math.floor(ms / 1000);
+    const milliseconds = Math.floor((ms % 1000) / 10); // 2 chiffres
+    return `${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className={`absolute top-8 left-8 z-50 font-mono text-xs md:text-sm opacity-50 transition-colors duration-1000 ${textColorClass}`}>
+      {formatTime(time)}
+    </div>
+  );
+}
+
 export default function Home() {
   // États séparés
   const [phrase, setPhrase] = useState("Initialisation...");
@@ -183,11 +207,11 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative w-full h-screen bg-black text-foreground overflow-hidden transition-colors duration-1000">
+    <main className="relative w-full h-dvh bg-black text-foreground overflow-hidden transition-colors duration-1000">
       
       {/* Fond Fixe SimplexNoise */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-[2000ms] ease-in-out"
+        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-2000 ease-in-out"
         style={{ opacity: noiseOpacity }}
       >
         <SimplexNoise
@@ -202,15 +226,18 @@ export default function Home() {
       </div>
 
       {/* Main Wrapper */}
-      <div className="relative z-20 w-full h-screen overflow-hidden flex items-center justify-center">
+      <div className="relative z-20 w-full h-full flex items-center justify-center">
         
         {/* Background Audio */}
         <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
 
+        {/* Timer */}
+        <Timer textColorClass={textColorClass} />
+
         {/* Sound Toggle Button */}
         <button 
           onClick={() => setIsMuted(!isMuted)}
-          className={`absolute top-8 right-8 z-50 mix-blend-difference opacity-50 hover:opacity-100 transition-opacity ${textColorClass}`}
+          className={`absolute top-8 right-8 z-50 mix-blend-difference opacity-50 hover:opacity-100 transition-opacity cursor-pointer ${textColorClass}`}
           aria-label={isMuted ? "Unmute" : "Mute"}
         >
           {isMuted ? (
@@ -248,7 +275,7 @@ export default function Home() {
           </div>
 
           {/* Dynamic AI Prompt Display */}
-          <div className="absolute bottom-12 left-0 right-0 flex items-center justify-center h-8">
+          <div className="absolute bottom-32 md:bottom-12 left-0 right-0 flex items-center justify-center h-8 pointer-events-none">
              <p className={`font-mono text-sm md:text-base text-center max-w-md px-4 transition-colors duration-1000 ${textColorClass} ${isBlinking ? 'animate-pulse' : ''}`}>
                 <span className="opacity-50 mr-2">{">"}</span>
                 {displayedPhrase}
