@@ -102,6 +102,9 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
+  // Langue
+  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
+  
   // État pour le clignotement
   const [isBlinking, setIsBlinking] = useState(false);
 
@@ -151,7 +154,7 @@ export default function Home() {
         // Arrêter le clignotement avant de commencer une nouvelle phrase
         setIsBlinking(false);
         
-        const res = await fetch('/api/generate-theme');
+        const res = await fetch(`/api/generate-theme?lang=${language}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         
@@ -204,7 +207,7 @@ export default function Home() {
         clearInterval(interval);
         if (colorTimeout) clearTimeout(colorTimeout);
     };
-  }, []);
+  }, [language]); // Re-fetch si la langue change
 
   return (
     <main className="relative w-full h-dvh bg-black text-foreground overflow-hidden transition-colors duration-1000">
@@ -254,6 +257,15 @@ export default function Home() {
               <line x1="8" y1="23" x2="16" y2="23"></line>
             </svg>
           )}
+        </button>
+
+        {/* Language Switcher */}
+        <button
+          onClick={() => setLanguage(language === 'fr' ? 'en' : 'fr')}
+          className={`absolute bottom-8 right-8 z-50 font-mono text-xs md:text-sm opacity-50 hover:opacity-100 transition-all cursor-pointer ${textColorClass}`}
+          aria-label="Change language"
+        >
+          {language === 'fr' ? 'EN' : 'FR'}
         </button>
 
         {/* LOGO ZONE */}

@@ -5,8 +5,16 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Récupérer le paramètre de langue
+    const { searchParams } = new URL(request.url);
+    const lang = searchParams.get('lang') || 'fr';
+    
+    const languageInstruction = lang === 'en' 
+      ? 'The phrase must be in English.'
+      : 'La phrase doit être en Français.';
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-4o", // Remplacer par le nom exact si différent
       messages: [
@@ -14,7 +22,7 @@ export async function GET() {
           role: "system",
           content: `Tu es une IA générative visuelle et poétique. Ton rôle est de créer des concepts d'ambiance visuelle.
           
-          Génère une phrase courte (max 8 mots) qui décrit une ambiance visuelle abstraite ou naturelle (ex: "Coucher de soleil sur Mars", "Néon sous la pluie", "Aube glaciaire"). La phrase doit être en Français, très créative et évocative.
+          Génère une phrase courte (max 8 mots) qui décrit une ambiance visuelle abstraite ou naturelle (ex: "Coucher de soleil sur Mars", "Néon sous la pluie", "Aube glaciaire"). ${languageInstruction} La phrase doit être très créative et évocative.
           
           Génère une palette de 5 couleurs hexadécimales qui correspondent PARFAITEMENT à cette ambiance.
           
