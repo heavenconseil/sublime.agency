@@ -11,9 +11,17 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const lang = searchParams.get('lang') || 'fr';
     
-    const languageInstruction = lang === 'en' 
-      ? 'The phrase must be in English.'
-      : 'La phrase doit être en Français.';
+    const languageInstructions: Record<string, string> = {
+      fr: 'La phrase doit être en Français.',
+      en: 'The phrase must be in English.',
+      es: 'La frase debe estar en Español.',
+      de: 'Der Satz muss auf Deutsch sein.',
+      ko: '문구는 한국어로 작성되어야 합니다.',
+      zh: '短语必须用中文书写。',
+      ar: 'يجب أن تكون العبارة باللغة العربية.'
+    };
+    
+    const languageInstruction = languageInstructions[lang] || languageInstructions['fr'];
     
     const completion = await openai.chat.completions.create({
       model: "gpt-4o", // Remplacer par le nom exact si différent

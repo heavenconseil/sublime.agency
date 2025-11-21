@@ -103,7 +103,7 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Langue
-  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
+  const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'de' | 'ko' | 'zh' | 'ar'>('fr');
   
   // État pour le clignotement
   const [isBlinking, setIsBlinking] = useState(false);
@@ -260,13 +260,22 @@ export default function Home() {
         </button>
 
         {/* Language Switcher */}
-        <button
-          onClick={() => setLanguage(language === 'fr' ? 'en' : 'fr')}
-          className={`absolute bottom-8 right-8 z-50 font-mono text-xs md:text-sm opacity-50 hover:opacity-100 transition-all cursor-pointer ${textColorClass}`}
-          aria-label="Change language"
-        >
-          {language === 'fr' ? 'EN' : 'FR'}
-        </button>
+        <div className="absolute bottom-8 right-8 z-50 flex flex-col gap-2 font-mono text-xs md:text-sm">
+          {(['fr', 'en', 'es', 'de', 'ko', 'zh', 'ar'] as const).map((lang) => (
+            <button
+              key={lang}
+              onClick={() => setLanguage(lang)}
+              className={`transition-all cursor-pointer ${
+                language === lang 
+                  ? `${textColorClass} opacity-100 font-bold` 
+                  : `${textColorClass} opacity-30 hover:opacity-60`
+              }`}
+              aria-label={`Change language to ${lang.toUpperCase()}`}
+            >
+              {lang.toUpperCase()}
+            </button>
+          ))}
+        </div>
 
         {/* LOGO ZONE */}
         <div className="flex flex-col items-center justify-center space-y-8">
