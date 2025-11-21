@@ -8,7 +8,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Sublime Agency",
-  description: "Sublime Agency - Creative Studio",
+  description: "Premium AI Studio - Creative & Immersive Experiences",
+  openGraph: {
+    title: "Sublime Agency",
+    description: "Premium AI Studio - Creative & Immersive Experiences",
+    url: "https://sublime.agency",
+    siteName: "Sublime Agency",
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sublime Agency",
+    description: "Premium AI Studio - Creative & Immersive Experiences",
+  },
 };
 
 export default function RootLayout({
