@@ -260,7 +260,7 @@ export default function Home() {
         </button>
 
         {/* Language Switcher */}
-        <div className="absolute bottom-8 right-8 z-50 flex flex-col gap-2 font-mono text-xs md:text-sm">
+        <div className="absolute bottom-8 right-8 left-8 md:left-auto md:right-8 md:flex-col md:gap-2 z-50 flex flex-row gap-3 justify-center md:justify-end font-mono text-xs md:text-sm">
           {(['fr', 'en', 'es', 'de', 'ko', 'zh', 'ar'] as const).map((lang) => (
             <button
               key={lang}
