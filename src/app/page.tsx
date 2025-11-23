@@ -307,12 +307,12 @@ export default function Home() {
           textColorClass={textColorClass} 
         />
 
-        {/* Rond clignotant en bas à gauche + Input */}
-        <InputPrompt 
+        {/* Rond clignotant en bas à gauche + Input - TEMPORAIREMENT MASQUÉ */}
+        {/* <InputPrompt 
           language={language} 
           textColorClass={textColorClass} 
           onSubmit={handlePromptSubmit}
-        />
+        /> */}
 
         {/* LOGO ZONE */}
         <div className="flex flex-col items-center justify-center">
