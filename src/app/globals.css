@@ -59,3 +59,15 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* Animation d'entrée pour les éléments de l'interface */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

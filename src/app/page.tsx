@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { getTextColor } from "@/utils/colors";
 
 // Components
@@ -12,6 +13,83 @@ import LogoDisplay from "@/components/LogoDisplay";
 import AiPrompt from "@/components/AiPrompt";
 import PartnerLogos from "@/components/PartnerLogos";
 
+// Hooks
+import { useMusicSync } from "@/hooks/useMusicSync";
+
+// Messages de chargement localisés pour le mode musique (incluant l'invitation à cliquer)
+const LOADING_MESSAGES: Record<string, string[]> = {
+  fr: [
+    "Génération de l'ambiance...",
+    "Cliquez n'importe où pour lancer l'expérience...",
+    "Composition musicale en cours...",
+    "Cliquez n'importe où pour lancer l'expérience...",
+    "Harmonisation des couleurs...",
+    "Cliquez n'importe où pour lancer l'expérience...",
+    "Synchronisation de l'expérience...",
+    "Cliquez n'importe où pour lancer l'expérience...",
+  ],
+  en: [
+    "Generating atmosphere...",
+    "Click anywhere to start the experience",
+    "Composing music...",
+    "Click anywhere to start the experience",
+    "Harmonizing colors...",
+    "Click anywhere to start the experience",
+    "Synchronizing experience...",
+    "Click anywhere to start the experience",
+  ],
+  es: [
+    "Generando ambiente...",
+    "Haz clic en cualquier lugar para iniciar",
+    "Componiendo música...",
+    "Haz clic en cualquier lugar para iniciar",
+    "Armonizando colores...",
+    "Haz clic en cualquier lugar para iniciar",
+    "Sincronizando experiencia...",
+    "Haz clic en cualquier lugar para iniciar",
+  ],
+  de: [
+    "Atmosphäre wird erzeugt...",
+    "Klicken Sie irgendwo, um zu starten",
+    "Musik wird komponiert...",
+    "Klicken Sie irgendwo, um zu starten",
+    "Farben werden harmonisiert...",
+    "Klicken Sie irgendwo, um zu starten",
+    "Erlebnis wird synchronisiert...",
+    "Klicken Sie irgendwo, um zu starten",
+  ],
+  ko: [
+    "분위기 생성 중...",
+    "아무 곳이나 클릭하여 시작하세요",
+    "음악 작곡 중...",
+    "아무 곳이나 클릭하여 시작하세요",
+    "색상 조화 중...",
+    "아무 곳이나 클릭하여 시작하세요",
+    "경험 동기화 중...",
+    "아무 곳이나 클릭하여 시작하세요",
+  ],
+  zh: [
+    "正在生成氛围...",
+    "点击任意位置开始体验",
+    "正在创作音乐...",
+    "点击任意位置开始体验",
+    "正在协调色彩...",
+    "点击任意位置开始体验",
+    "正在同步体验...",
+    "点击任意位置开始体验",
+  ],
+  ar: [
+    "جارٍ توليد الأجواء...",
+    "انقر في أي مكان للبدء",
+    "جارٍ تأليف الموسيقى...",
+    "انقر في أي مكان للبدء",
+    "جارٍ تنسيق الألوان...",
+    "انقر في أي مكان للبدء",
+    "جارٍ مزامنة التجربة...",
+    "انقر في أي مكان للبدء",
+  ],
+};
+
 // Import dynamique du composant ShaderBackground pour éviter les erreurs SSR
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), {
   ssr: false,
@@ -19,6 +97,9 @@ const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), 
 });
 
 export default function Home() {
+  // Mode musique synchronisée (activé par défaut)
+  const [musicMode, setMusicMode] = useState(true);
+  
   // États séparés
   const [phrase, setPhrase] = useState("Initialisation...");
   const [colors, setColors] = useState(["#2f2235", "#3f3244", "#60495a", "#a9aca9", "#bfc3ba"]);
@@ -32,11 +113,150 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  
   // Langue
   const [language, setLanguage] = useState<Language>('fr');
+  const previousLanguageRef = useRef<Language>(language);
   
   const mounted = useRef(false);
+  
+  // Index pour les messages de chargement
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  
+  // Délai minimum de 12 secondes avant de passer au premier thème
+  const [introCompleted, setIntroCompleted] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIntroCompleted(true);
+    }, 12000); // 12 secondes
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Hook pour la musique synchronisée
+  const { 
+    currentBundle, 
+    isLoading: isMusicLoading,
+    error: musicError 
+  } = useMusicSync({ 
+    language, 
+    isMuted, 
+    enabled: musicMode,
+    canPlay: introCompleted // Ne jouer qu'après l'intro de 12s
+  });
+
+  // Traduction en temps réel quand la langue change
+  useEffect(() => {
+    const prevLang = previousLanguageRef.current;
+    previousLanguageRef.current = language;
+    
+    // Ne pas traduire si c'est le premier render ou si on est en loading
+    if (prevLang === language || isMusicLoading) return;
+    
+    // Ne pas traduire les messages de chargement
+    const loadingMessages = Object.values(LOADING_MESSAGES).flat();
+    if (loadingMessages.includes(phrase)) return;
+    
+    // Traduire la phrase actuelle
+    const translateCurrentPhrase = async () => {
+      try {
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: phrase, targetLang: language }),
+        });
+        if (response.ok) {
+          const { translated } = await response.json();
+          setPhrase(translated);
+        }
+      } catch (err) {
+        console.error("Translation error:", err);
+      }
+    };
+    
+    translateCurrentPhrase();
+  }, [language, phrase, isMusicLoading]);
+  
+  // Cycler les messages de chargement pendant l'intro (12 premières secondes)
+  useEffect(() => {
+    // Continuer tant que l'intro n'est pas terminée
+    if (!musicMode || introCompleted) return;
+    
+    const messages = LOADING_MESSAGES[language] || LOADING_MESSAGES['fr'];
+    
+    // Afficher le premier message
+    setPhrase(messages[0]);
+    
+    const interval = setInterval(() => {
+      setLoadingMessageIndex(prev => {
+        const next = (prev + 1) % messages.length;
+        setPhrase(messages[next]);
+        return next;
+      });
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, [musicMode, introCompleted, language]);
+
+  // Synchroniser les états quand on est en mode musique et qu'un bundle est prêt
+  // Attendre que l'intro de 12s soit terminée avant de switcher
+  useEffect(() => {
+    if (musicMode && currentBundle && !isMusicLoading && introCompleted) {
+      // Traduire la phrase si nécessaire (le bundle peut avoir été généré avec une autre langue)
+      const syncPhrase = async () => {
+        // Si la langue actuelle est l'anglais, pas besoin de traduire (les bundles sont en EN de base)
+        if (language === 'en') {
+          setPhrase(currentBundle.phrase);
+        } else {
+          // Traduire dans la langue actuelle
+          try {
+            const response = await fetch("/api/translate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: currentBundle.phrase, targetLang: language }),
+            });
+            if (response.ok) {
+              const { translated } = await response.json();
+              setPhrase(translated);
+            } else {
+              setPhrase(currentBundle.phrase);
+            }
+          } catch {
+            setPhrase(currentBundle.phrase);
+          }
+        }
+      };
+      
+      syncPhrase();
+      setColors(currentBundle.colors);
+      
+      const newTextColor = getTextColor(currentBundle.colors);
+      setTextColorClass(newTextColor);
+      setIsDarkContent(newTextColor === "text-black");
+      
+      setSimParams({
+        speed: currentBundle.speed,
+        softness: currentBundle.softness,
+        stepsPerColor: currentBundle.stepsPerColor
+      });
+      
+      // Fade out 01.mp3 quand la musique générée prend le relais
+      if (audioRef.current && !audioRef.current.paused) {
+        const audio = audioRef.current;
+        let volume = audio.volume;
+        const fadeOut = setInterval(() => {
+          volume -= 0.05;
+          if (volume <= 0) {
+            clearInterval(fadeOut);
+            audio.pause();
+            audio.volume = 0.5; // Reset pour la prochaine fois
+          } else {
+            audio.volume = volume;
+          }
+        }, 100);
+      }
+    }
+  }, [musicMode, currentBundle, isMusicLoading, introCompleted, language]);
 
   // État pour tracker si on a déjà eu une interaction utilisateur
   const hasUserInteracted = useRef(false);
@@ -44,11 +264,11 @@ export default function Home() {
   // Démarrer le son au premier clic n'importe où sur la page
   useEffect(() => {
     const handleFirstClick = async () => {
-      if (!hasUserInteracted.current && isMuted && audioRef.current) {
+      if (!hasUserInteracted.current && isMuted) {
         hasUserInteracted.current = true;
         setIsMuted(false);
         
-        // Fade-in sur le son
+        // Jouer 01.mp3 avec fade-in (en mode classique OU pendant le chargement en mode musique)
         if (audioRef.current) {
           audioRef.current.volume = 0;
           try {
@@ -57,7 +277,7 @@ export default function Home() {
             // Animation du volume de 0 à 0.5 sur 2 secondes
             let currentVolume = 0;
             const targetVolume = 0.5;
-            const fadeStep = targetVolume / 40; // 40 steps sur 2000ms = 50ms par step
+            const fadeStep = targetVolume / 40;
             
             const fadeInterval = setInterval(() => {
               if (audioRef.current && currentVolume < targetVolume) {
@@ -71,6 +291,7 @@ export default function Home() {
             console.log("Could not autoplay audio:", err);
           }
         }
+        // En mode musique, le hook useMusicSync gère aussi la musique générée
       }
     };
 
@@ -99,16 +320,16 @@ export default function Home() {
     playAudio();
   }, [isMuted]);
 
+  // Mode classique (sans musique synchronisée)
   useEffect(() => {
+    // Si on est en mode musique, ne pas lancer les fetches classiques
+    if (musicMode) return;
+    
     mounted.current = true;
     let colorTimeout: NodeJS.Timeout;
     let interval: NodeJS.Timeout;
 
     const fetchNewTheme = async () => {
-      // Si un résultat est affiché, on continue quand même le cycle de fond et de phrase
-      // La seule chose qu'on ne veut pas perturber c'est l'expérience utilisateur, 
-      // mais le brief est clair : "le typewriter doit continuer son travail"
-
       try {
         const res = await fetch(`/api/generate-theme?lang=${language}`);
         if (!res.ok) throw new Error('Failed to fetch');
@@ -159,7 +380,7 @@ export default function Home() {
         clearInterval(interval);
         if (colorTimeout) clearTimeout(colorTimeout);
     };
-  }, [language]); // Re-fetch si la langue change
+  }, [language, musicMode]); // Re-fetch si la langue change ou si on quitte le mode musique
 
   return (
     <main className="relative w-full h-dvh bg-white text-foreground overflow-hidden transition-colors duration-1000">
@@ -175,32 +396,40 @@ export default function Home() {
       {/* Main Wrapper */}
       <div className="relative z-20 w-full h-full flex items-center justify-center">
         
-        {/* Background Audio */}
+        {/* Background Audio - joue pendant le chargement en mode musique aussi */}
         <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
 
-        {/* Timer */}
-        <Timer textColorClass={textColorClass} />
+        {/* Timer - delay 4s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_4s_forwards] absolute top-8 left-8 z-50">
+          <Timer textColorClass={textColorClass} />
+        </div>
 
-        {/* Sound Toggle Button */}
-        <SoundToggle 
-          isMuted={isMuted} 
-          setIsMuted={setIsMuted} 
-          textColorClass={textColorClass} 
-        />
+        {/* Sound Toggle Button - delay 6s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_6s_forwards] absolute top-8 right-8 z-50">
+          <SoundToggle 
+            isMuted={isMuted} 
+            setIsMuted={setIsMuted} 
+            textColorClass={textColorClass} 
+          />
+        </div>
 
-        {/* Language Switcher */}
-        <LanguageSwitcher 
-          language={language} 
-          setLanguage={setLanguage} 
-          textColorClass={textColorClass}
-          isMuted={isMuted}
-        />
+        {/* Language Switcher - delay 8s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_8s_forwards] absolute bottom-8 right-8 z-50">
+          <LanguageSwitcher 
+            language={language} 
+            setLanguage={setLanguage} 
+            textColorClass={textColorClass}
+            isMuted={isMuted}
+          />
+        </div>
 
-        {/* Partner Logos */}
-        <PartnerLogos textColorClass={textColorClass} />
+        {/* Partner Logos - delay 10s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_10s_forwards] absolute bottom-8 left-8 z-50">
+          <PartnerLogos textColorClass={textColorClass} />
+        </div>
 
-        {/* LOGO ZONE */}
-        <div className="flex flex-col items-center justify-center">
+        {/* LOGO ZONE - avec animation d'entrée delay 1s */}
+        <div className="flex flex-col items-center justify-center opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
           
           {/* Logo */}
           <LogoDisplay 
@@ -209,18 +438,16 @@ export default function Home() {
             textColorClass={textColorClass} 
             isMovedUp={false}
           />
-
-          {/* Dynamic AI Prompt Display - Toujours visible */}
-          <div>
-             <AiPrompt 
-                phrase={phrase} 
-                textColorClass={textColorClass} 
-                audioRef={audioRef}
-                isMuted={isMuted}
-             />
-          </div>
-
+          
         </div>
+
+        {/* Dynamic AI Prompt Display - positionné en bas */}
+        <AiPrompt 
+          phrase={phrase} 
+          textColorClass={textColorClass} 
+          audioRef={audioRef}
+          isMuted={isMuted}
+        />
 
       </div>
     </main>

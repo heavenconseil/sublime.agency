@@ -15,7 +15,10 @@ export default function LanguageSwitcher({ language, setLanguage, textColorClass
   const languages: Language[] = ['fr', 'en', 'es', 'de', 'ko', 'zh', 'ar'];
   const clickAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleLanguageChange = (lang: Language) => {
+  const handleLanguageChange = (e: React.MouseEvent, lang: Language) => {
+    // Empêcher le clic de déclencher l'interaction globale (lancement de la musique)
+    e.stopPropagation();
+    
     // Jouer le son de clic si pas muted
     if (!isMuted) {
       if (!clickAudioRef.current) {
@@ -34,7 +37,7 @@ export default function LanguageSwitcher({ language, setLanguage, textColorClass
         {languages.map((lang) => (
           <button
             key={lang}
-            onClick={() => handleLanguageChange(lang)}
+            onClick={(e) => handleLanguageChange(e, lang)}
             className={`transition-all cursor-pointer ${
               language === lang 
                 ? `${textColorClass} opacity-100 font-medium` 
@@ -52,7 +55,7 @@ export default function LanguageSwitcher({ language, setLanguage, textColorClass
         {languages.map((lang) => (
           <button
             key={lang}
-            onClick={() => handleLanguageChange(lang)}
+            onClick={(e) => handleLanguageChange(e, lang)}
             className={`transition-all cursor-pointer ${
               language === lang 
                 ? `${textColorClass} opacity-100 font-medium` 
