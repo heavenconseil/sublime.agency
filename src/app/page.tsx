@@ -8,10 +8,8 @@ import { getTextColor } from "@/utils/colors";
 import Timer from "@/components/Timer";
 import SoundToggle from "@/components/SoundToggle";
 import LanguageSwitcher, { Language } from "@/components/LanguageSwitcher";
-import InputPrompt from "@/components/InputPrompt";
 import LogoDisplay from "@/components/LogoDisplay";
 import AiPrompt from "@/components/AiPrompt";
-import ResultDisplay, { ResultData } from "@/components/ResultDisplay";
 
 // Import dynamique du composant ShaderBackground pour éviter les erreurs SSR
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), {
@@ -33,19 +31,11 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // État pour tracker si le son est temporairement coupé par une vidéo
-  const [isMutedByVideo, setIsMutedByVideo] = useState(false);
   
   // Langue
   const [language, setLanguage] = useState<Language>('fr');
   
   const mounted = useRef(false);
-  // État pour l'opacité du bruit (pour transition douce)
-  const [noiseOpacity, setNoiseOpacity] = useState(1);
-
-  // État pour le résultat (prompt utilisateur)
-  const [resultData, setResultData] = useState<ResultData | null>(null);
-  const [isResultVisible, setIsResultVisible] = useState(false);
 
   // État pour tracker si on a déjà eu une interaction utilisateur
   const hasUserInteracted = useRef(false);
@@ -135,23 +125,19 @@ export default function Home() {
 
             colorTimeout = setTimeout(() => {
                 if (mounted.current) {
-                    // Petit effet de transition sur le noise
-                    setNoiseOpacity(0);
-                    setTimeout(() => {
-                        setColors(data.colors);
-                        
-                        // Calculer la nouvelle couleur de texte
-                        const newTextColor = getTextColor(data.colors);
-                        setTextColorClass(newTextColor);
-                        setIsDarkContent(newTextColor === "text-black");
+                    // Le crossfade est géré par ShaderBackground
+                    setColors(data.colors);
+                    
+                    // Calculer la nouvelle couleur de texte
+                    const newTextColor = getTextColor(data.colors);
+                    setTextColorClass(newTextColor);
+                    setIsDarkContent(newTextColor === "text-black");
 
-                        setSimParams({
-                            speed: data.speed,
-                            softness: data.softness,
-                            stepsPerColor: data.stepsPerColor
-                        });
-                        setNoiseOpacity(1);
-                    }, 500); // Changement de couleur pendant que l'opacité est basse
+                    setSimParams({
+                        speed: data.speed,
+                        softness: data.softness,
+                        stepsPerColor: data.stepsPerColor
+                    });
                 }
             }, typingDuration + 200); // +200ms de pause après la fin
         }
@@ -172,108 +158,10 @@ export default function Home() {
         clearInterval(interval);
         if (colorTimeout) clearTimeout(colorTimeout);
     };
-  }, [language, isResultVisible]); // Re-fetch si la langue change OU si l'état de visibilité change (pour relancer le cycle quand on ferme)
-
-  // Gestion de la soumission du prompt utilisateur
-  const handlePromptSubmit = async (userPrompt: string) => {
-    console.log('[DEBUG] handlePromptSubmit called with:', userPrompt);
-    try {
-        const res = await fetch('/api/process-prompt', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                prompt: userPrompt, 
-                language,
-                currentAudio: audioRef.current?.src // Envoyer l'URL du son actuel pour éviter les doublons
-            })
-        });
-        
-        console.log('[DEBUG] Response status:', res.status);
-        console.log('[DEBUG] Response headers:', Object.fromEntries(res.headers.entries()));
-        
-        if (!res.ok) throw new Error('Failed to process prompt');
-        
-        // Vérifier si c'est un stream (text/event-stream) ou du JSON
-        const contentType = res.headers.get('content-type');
-        console.log('[DEBUG] Content-Type:', contentType);
-        
-        if (contentType?.includes('text/event-stream') || contentType?.includes('text/plain')) {
-            console.log('[DEBUG] Detected streaming response');
-            // C'est du streaming (cas TEXTE)
-            setResultData({ type: 'text', content: '' });
-            setIsResultVisible(true);
-
-            const reader = res.body?.getReader();
-            const decoder = new TextDecoder();
-            let accumulatedText = '';
-
-            if (reader) {
-                try {
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-
-                        const chunk = decoder.decode(value, { stream: true });
-                        accumulatedText += chunk;
-                        setResultData({ type: 'text', content: accumulatedText });
-                    }
-                } finally {
-                    reader.releaseLock();
-                }
-            }
-            return;
-        }
-
-        console.log('[DEBUG] Detected JSON response');
-        // Sinon, c'est du JSON (audio, video, image)
-        const data = await res.json();
-        console.log('[DEBUG] Response data:', data);
-
-        // Cas spécial AUDIO : on change juste le son sans afficher l'overlay
-        if (data.type === 'audio') {
-            if (audioRef.current) {
-                audioRef.current.src = data.content;
-                if (!isMuted) {
-                    await audioRef.current.play();
-                }
-            }
-            // On peut éventuellement afficher un toast ou changer la phrase en bas pour feedback
-            // setPhrase(data.caption || "Audio track changed."); <-- Ligne retirée pour ne pas perturber le typewriter
-            // return; // On arrête ici, pas d'overlay <-- Ligne retirée précédemment, on laisse continuer
-        }
-        
-        setResultData(data);
-        setIsResultVisible(true);
-
-        // Si c'est une vidéo, on coupe le son de fond
-        if (data.type === 'video' && audioRef.current) {
-            audioRef.current.pause();
-            setIsMutedByVideo(true); // Marquer que le son est coupé par la vidéo
-        }
-
-    } catch (error) {
-        console.error("Error processing prompt:", error);
-    }
-  };
-
-  // Gestion de la fermeture du résultat
-  const handleCloseResult = () => {
-    setIsResultVisible(false);
-    
-    // Relancer le son si l'utilisateur n'est pas muted et que c'était une vidéo
-    if (resultData?.type === 'video' && !isMuted && audioRef.current) {
-        audioRef.current.play().catch(err => console.log("Audio resume error:", err));
-        setIsMutedByVideo(false); // Retirer le flag de mute par vidéo
-    }
-    
-    // Petit délai pour nettoyer les données après l'animation de sortie
-    setTimeout(() => {
-        setResultData(null);
-    }, 500);
-  };
+  }, [language]); // Re-fetch si la langue change
 
   return (
-    <main className="relative w-full h-dvh bg-black text-foreground overflow-hidden transition-colors duration-1000">
+    <main className="relative w-full h-dvh bg-white text-foreground overflow-hidden transition-colors duration-1000">
       
       {/* Shader Background Component */}
       <ShaderBackground
@@ -281,7 +169,6 @@ export default function Home() {
         speed={simParams.speed}
         softness={simParams.softness}
         stepsPerColor={simParams.stepsPerColor}
-        opacity={noiseOpacity}
       />
 
       {/* Main Wrapper */}
@@ -295,7 +182,7 @@ export default function Home() {
 
         {/* Sound Toggle Button */}
         <SoundToggle 
-          isMuted={isMuted || isMutedByVideo} 
+          isMuted={isMuted} 
           setIsMuted={setIsMuted} 
           textColorClass={textColorClass} 
         />
@@ -307,13 +194,6 @@ export default function Home() {
           textColorClass={textColorClass} 
         />
 
-        {/* Rond clignotant en bas à gauche + Input - TEMPORAIREMENT MASQUÉ */}
-        {/* <InputPrompt 
-          language={language} 
-          textColorClass={textColorClass} 
-          onSubmit={handlePromptSubmit}
-        /> */}
-
         {/* LOGO ZONE */}
         <div className="flex flex-col items-center justify-center">
           
@@ -322,7 +202,7 @@ export default function Home() {
             language={language} 
             isDarkContent={isDarkContent} 
             textColorClass={textColorClass} 
-            isMovedUp={isResultVisible}
+            isMovedUp={false}
           />
 
           {/* Dynamic AI Prompt Display - Toujours visible */}
@@ -330,20 +210,12 @@ export default function Home() {
              <AiPrompt 
                 phrase={phrase} 
                 textColorClass={textColorClass} 
-                audioRef={audioRef} 
+                audioRef={audioRef}
+                isMuted={isMuted}
              />
           </div>
 
         </div>
-
-        {/* RESULT DISPLAY OVERLAY */}
-        <ResultDisplay 
-            data={resultData}
-            isVisible={isResultVisible}
-            onClose={handleCloseResult}
-            textColorClass={textColorClass}
-            onSubmit={handlePromptSubmit}
-        />
 
       </div>
     </main>
