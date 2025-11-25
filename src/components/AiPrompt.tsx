@@ -34,7 +34,7 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
     const audioPath = '/sounds/prompt.mp3';
     const audio = new Audio(audioPath);
     audio.loop = true;
-    audio.volume = 0.6; // Volume augmenté pour tester
+    audio.volume = 0.2; // Volume réduit
     
     // Gérer les erreurs de chargement
     audio.addEventListener('error', (e) => {

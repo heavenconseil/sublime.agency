@@ -122,13 +122,16 @@ export default function Home() {
   // Index pour les messages de chargement
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   
-  // Délai minimum de 12 secondes avant de passer au premier thème
+  // Bloquer le switch de thème temporairement après un changement de langue
+  const [languageSwitchLock, setLanguageSwitchLock] = useState(false);
+  
+  // Délai minimum de 20 secondes avant de passer au premier thème
   const [introCompleted, setIntroCompleted] = useState(false);
   
   useEffect(() => {
     const timer = setTimeout(() => {
       setIntroCompleted(true);
-    }, 12000); // 12 secondes
+    }, 20000); // 20 secondes
     
     return () => clearTimeout(timer);
   }, []);
@@ -157,6 +160,12 @@ export default function Home() {
     const loadingMessages = Object.values(LOADING_MESSAGES).flat();
     if (loadingMessages.includes(phrase)) return;
     
+    // Bloquer le switch de thème pendant 5 secondes pour laisser le typewriter finir
+    setLanguageSwitchLock(true);
+    const unlockTimer = setTimeout(() => {
+      setLanguageSwitchLock(false);
+    }, 5000);
+    
     // Traduire la phrase actuelle
     const translateCurrentPhrase = async () => {
       try {
@@ -175,6 +184,8 @@ export default function Home() {
     };
     
     translateCurrentPhrase();
+    
+    return () => clearTimeout(unlockTimer);
   }, [language, phrase, isMusicLoading]);
   
   // Cycler les messages de chargement pendant l'intro (12 premières secondes)
@@ -199,8 +210,11 @@ export default function Home() {
   }, [musicMode, introCompleted, language]);
 
   // Synchroniser les états quand on est en mode musique et qu'un bundle est prêt
-  // Attendre que l'intro de 12s soit terminée avant de switcher
+  // Attendre que l'intro soit terminée ET que le lock de langue soit levé
   useEffect(() => {
+    // Si un changement de langue vient de se produire, attendre
+    if (languageSwitchLock) return;
+    
     if (musicMode && currentBundle && !isMusicLoading && introCompleted) {
       // Traduire la phrase si nécessaire (le bundle peut avoir été généré avec une autre langue)
       const syncPhrase = async () => {
@@ -256,7 +270,7 @@ export default function Home() {
         }, 100);
       }
     }
-  }, [musicMode, currentBundle, isMusicLoading, introCompleted, language]);
+  }, [musicMode, currentBundle, isMusicLoading, introCompleted, language, languageSwitchLock]);
 
   // État pour tracker si on a déjà eu une interaction utilisateur
   const hasUserInteracted = useRef(false);
@@ -399,13 +413,13 @@ export default function Home() {
         {/* Background Audio - joue pendant le chargement en mode musique aussi */}
         <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
 
-        {/* Timer - delay 4s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_4s_forwards] absolute top-8 left-8 z-50">
+        {/* Timer - delay 3s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-8 left-8 z-50">
           <Timer textColorClass={textColorClass} />
         </div>
 
-        {/* Sound Toggle Button - delay 6s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_6s_forwards] absolute top-8 right-8 z-50">
+        {/* Sound Toggle Button - delay 5s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-8 right-8 z-50">
           <SoundToggle 
             isMuted={isMuted} 
             setIsMuted={setIsMuted} 
@@ -413,8 +427,8 @@ export default function Home() {
           />
         </div>
 
-        {/* Language Switcher - delay 8s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_8s_forwards] absolute bottom-8 right-8 z-50">
+        {/* Language Switcher - delay 7s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-8 right-8 z-50">
           <LanguageSwitcher 
             language={language} 
             setLanguage={setLanguage} 
@@ -423,13 +437,13 @@ export default function Home() {
           />
         </div>
 
-        {/* Partner Logos - delay 10s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_10s_forwards] absolute bottom-8 left-8 z-50">
+        {/* Partner Logos - delay 9s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-8 left-8 z-50">
           <PartnerLogos textColorClass={textColorClass} />
         </div>
 
-        {/* LOGO ZONE - avec animation d'entrée delay 1s */}
-        <div className="flex flex-col items-center justify-center opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
+        {/* LOGO ZONE - avec animation d'entrée delay 0.5s */}
+        <div className="flex flex-col items-center justify-center opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
           
           {/* Logo */}
           <LogoDisplay 
