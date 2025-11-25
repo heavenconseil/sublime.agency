@@ -10,6 +10,7 @@ import SoundToggle from "@/components/SoundToggle";
 import LanguageSwitcher, { Language } from "@/components/LanguageSwitcher";
 import LogoDisplay from "@/components/LogoDisplay";
 import AiPrompt from "@/components/AiPrompt";
+import PartnerLogos from "@/components/PartnerLogos";
 
 // Import dynamique du composant ShaderBackground pour éviter les erreurs SSR
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), {
@@ -191,8 +192,12 @@ export default function Home() {
         <LanguageSwitcher 
           language={language} 
           setLanguage={setLanguage} 
-          textColorClass={textColorClass} 
+          textColorClass={textColorClass}
+          isMuted={isMuted}
         />
+
+        {/* Partner Logos */}
+        <PartnerLogos textColorClass={textColorClass} />
 
         {/* LOGO ZONE */}
         <div className="flex flex-col items-center justify-center">

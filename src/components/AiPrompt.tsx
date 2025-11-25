@@ -156,7 +156,7 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
     if (cursorRef.current) {
       cursorTween.current = gsap.to(cursorRef.current, {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.1,
         repeat: -1,
         yoyo: true,
         ease: "steps(1)", // Effet clignotement terminal classique
@@ -196,10 +196,10 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
   const displayedPhrase = useTypewriter(phrase, 60, playTypingSound, handleTypingComplete);
 
   return (
-    <div className="absolute bottom-32 md:bottom-8 left-0 right-0 flex items-center justify-center h-8 pointer-events-none">
+    <div className="absolute bottom-32 md:bottom-8 left-0 right-0 flex items-center justify-center pointer-events-none">
        <p 
          ref={paragraphRef}
-         className={`font-mono text-sm md:text-base text-center max-w-md px-4 transition-colors duration-1000 ${textColorClass}`}
+         className={`font-mono text-xs text-center max-w-md transition-colors duration-1000 ${textColorClass}`}
        >
           <span className="opacity-50 mr-2">{">"}</span>
           {displayedPhrase}
