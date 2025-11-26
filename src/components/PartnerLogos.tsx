@@ -67,13 +67,13 @@ export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
   }, []);
 
   return (
-    <div className="absolute bottom-8 left-8 z-50 h-8 w-32 overflow-hidden">
-      <div className="relative w-full h-full">
+    <div className="h-8 w-32 overflow-hidden flex justify-center md:justify-start">
+      <div className="relative w-full h-full flex justify-center md:justify-start">
         <a 
           href="https://hopscotch.one" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="absolute top-2 left-0"
+          className="absolute top-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
         >
           <Image
             ref={hopscotchRef}
@@ -89,7 +89,7 @@ export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
           href="https://heaven.paris" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="absolute top-2 left-0"
+          className="absolute top-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
         >
           <Image
             ref={heavenRef}

@@ -10,23 +10,41 @@ export default function SoundToggle({ isMuted, setIsMuted, textColorClass }: Sou
   return (
     <button 
       onClick={() => setIsMuted(!isMuted)}
-      className={`absolute top-8 right-8 z-50 mix-blend-difference opacity-50 hover:opacity-100 transition-opacity cursor-pointer ${textColorClass}`}
+      className={`mix-blend-difference opacity-50 hover:opacity-100 transition-opacity cursor-pointer ${textColorClass}`}
       aria-label={isMuted ? "Unmute" : "Mute"}
     >
-      {isMuted ? (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="1" y1="1" x2="23" y2="23"></line>
-          <path d="M9 9v6a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
-          <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
-        </svg>
-      ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-          <line x1="12" y1="19" x2="12" y2="23"></line>
-          <line x1="8" y1="23" x2="16" y2="23"></line>
-        </svg>
-      )}
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="24" 
+        height="24" 
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        {/* Bar 1 - smallest */}
+        <rect x="0" y="11" width="1" height="2" className={isMuted ? "" : "animate-equalizer-1"} />
+        {/* Bar 2 */}
+        <rect x="2" y="10" width="1" height="4" className={isMuted ? "" : "animate-equalizer-2"} />
+        {/* Bar 3 */}
+        <rect x="4" y="9" width="1" height="6" className={isMuted ? "" : "animate-equalizer-3"} />
+        {/* Bar 4 */}
+        <rect x="6" y="8" width="1" height="8" className={isMuted ? "" : "animate-equalizer-1"} />
+        {/* Bar 5 */}
+        <rect x="8" y="6" width="1" height="12" className={isMuted ? "" : "animate-equalizer-2"} />
+        {/* Bar 6 - tallest */}
+        <rect x="10" y="5" width="1" height="14" className={isMuted ? "" : "animate-equalizer-3"} />
+        {/* Bar 7 - tallest */}
+        <rect x="12" y="5" width="1" height="14" className={isMuted ? "" : "animate-equalizer-1"} />
+        {/* Bar 8 */}
+        <rect x="14" y="6" width="1" height="12" className={isMuted ? "" : "animate-equalizer-2"} />
+        {/* Bar 9 */}
+        <rect x="16" y="8" width="1" height="8" className={isMuted ? "" : "animate-equalizer-3"} />
+        {/* Bar 10 */}
+        <rect x="18" y="9" width="1" height="6" className={isMuted ? "" : "animate-equalizer-1"} />
+        {/* Bar 11 */}
+        <rect x="20" y="10" width="1" height="4" className={isMuted ? "" : "animate-equalizer-2"} />
+        {/* Bar 12 - smallest */}
+        <rect x="22" y="11" width="1" height="2" className={isMuted ? "" : "animate-equalizer-3"} />
+      </svg>
     </button>
   );
 }

@@ -23,7 +23,7 @@ export default function Timer({ textColorClass }: TimerProps) {
   };
 
   return (
-    <div className={`absolute top-8 left-8 z-50 font-mono text-xs md:text-sm opacity-50 transition-colors duration-1000 ${textColorClass}`}>
+    <div className={`font-mono text-xs transition-colors duration-1000 ${textColorClass}`}>
       {formatTime(time)}
     </div>
   );

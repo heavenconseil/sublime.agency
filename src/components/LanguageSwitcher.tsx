@@ -33,7 +33,7 @@ export default function LanguageSwitcher({ language, setLanguage, textColorClass
   return (
     <>
       {/* Language Switcher - Desktop (vertical) */}
-      <div className="hidden md:flex absolute bottom-8 right-8 z-50 flex-col items-end gap-1 font-mono text-xs">
+      <div className="hidden md:flex flex-col items-end gap-1 font-mono text-xs">
         {languages.map((lang) => (
           <button
             key={lang}
@@ -51,7 +51,7 @@ export default function LanguageSwitcher({ language, setLanguage, textColorClass
       </div>
 
       {/* Language Switcher - Mobile (horizontal) */}
-      <div className="md:hidden absolute bottom-8 right-8 left-8 z-50 flex flex-row gap-3 justify-center font-mono text-xs">
+      <div className="md:hidden flex flex-row gap-3 justify-center font-mono text-xs">
         {languages.map((lang) => (
           <button
             key={lang}

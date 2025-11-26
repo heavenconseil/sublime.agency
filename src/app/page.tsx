@@ -414,12 +414,12 @@ export default function Home() {
         <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
 
         {/* Timer - delay 3s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-8 left-8 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-4 left-4 md:top-8 md:left-8 z-50">
           <Timer textColorClass={textColorClass} />
         </div>
 
         {/* Sound Toggle Button - delay 5s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-8 right-8 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-4 right-4 md:top-8 md:right-8 z-50">
           <SoundToggle 
             isMuted={isMuted} 
             setIsMuted={setIsMuted} 
@@ -428,7 +428,7 @@ export default function Home() {
         </div>
 
         {/* Language Switcher - delay 7s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-8 right-8 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:bottom-8 md:right-8 z-50">
           <LanguageSwitcher 
             language={language} 
             setLanguage={setLanguage} 
@@ -438,7 +438,7 @@ export default function Home() {
         </div>
 
         {/* Partner Logos - delay 9s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-8 left-8 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-8 md:left-8 z-50">
           <PartnerLogos textColorClass={textColorClass} />
         </div>
 
