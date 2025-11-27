@@ -209,66 +209,75 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [musicMode, introCompleted, language]);
 
+  // Ref pour tracker le dernier bundle synchronisé
+  const lastSyncedBundleId = useRef<string | null>(null);
+
   // Synchroniser les états quand on est en mode musique et qu'un bundle est prêt
-  // Attendre que l'intro soit terminée ET que le lock de langue soit levé
   useEffect(() => {
-    // Si un changement de langue vient de se produire, attendre
-    if (languageSwitchLock) return;
+    if (!musicMode || !currentBundle || isMusicLoading || !introCompleted) return;
     
-    if (musicMode && currentBundle && !isMusicLoading && introCompleted) {
-      // Traduire la phrase si nécessaire (le bundle peut avoir été généré avec une autre langue)
-      const syncPhrase = async () => {
-        // Si la langue actuelle est l'anglais, pas besoin de traduire (les bundles sont en EN de base)
-        if (language === 'en') {
-          setPhrase(currentBundle.phrase);
-        } else {
-          // Traduire dans la langue actuelle
-          try {
-            const response = await fetch("/api/translate", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: currentBundle.phrase, targetLang: language }),
-            });
-            if (response.ok) {
-              const { translated } = await response.json();
-              setPhrase(translated);
-            } else {
-              setPhrase(currentBundle.phrase);
-            }
-          } catch {
+    // Éviter de re-sync le même bundle (sauf si la langue a changé)
+    const isNewBundle = lastSyncedBundleId.current !== currentBundle.id;
+    const needsTranslation = isNewBundle || !languageSwitchLock;
+    
+    if (!isNewBundle && languageSwitchLock) return;
+    
+    lastSyncedBundleId.current = currentBundle.id;
+    
+    // Toujours synchroniser les couleurs et params visuels
+    setColors(currentBundle.colors);
+    
+    const newTextColor = getTextColor(currentBundle.colors);
+    setTextColorClass(newTextColor);
+    setIsDarkContent(newTextColor === "text-black");
+    
+    setSimParams({
+      speed: currentBundle.speed,
+      softness: currentBundle.softness,
+      stepsPerColor: currentBundle.stepsPerColor
+    });
+    
+    // Traduire la phrase si nécessaire
+    const syncPhrase = async () => {
+      if (language === 'en') {
+        setPhrase(currentBundle.phrase);
+      } else {
+        try {
+          const response = await fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: currentBundle.phrase, targetLang: language }),
+          });
+          if (response.ok) {
+            const { translated } = await response.json();
+            setPhrase(translated);
+          } else {
             setPhrase(currentBundle.phrase);
           }
+        } catch {
+          setPhrase(currentBundle.phrase);
         }
-      };
-      
-      syncPhrase();
-      setColors(currentBundle.colors);
-      
-      const newTextColor = getTextColor(currentBundle.colors);
-      setTextColorClass(newTextColor);
-      setIsDarkContent(newTextColor === "text-black");
-      
-      setSimParams({
-        speed: currentBundle.speed,
-        softness: currentBundle.softness,
-        stepsPerColor: currentBundle.stepsPerColor
-      });
-      
-      // Fade out 01.mp3 quand la musique générée prend le relais
-      if (audioRef.current && !audioRef.current.paused) {
-        const audio = audioRef.current;
-        let volume = audio.volume;
-        const fadeOut = setInterval(() => {
-          volume -= 0.05;
-          if (volume <= 0) {
-            clearInterval(fadeOut);
-            audio.pause();
-            audio.volume = 0.5; // Reset pour la prochaine fois
-          } else {
-            audio.volume = volume;
-          }
-        }, 100);
       }
+    };
+    
+    if (needsTranslation) {
+      syncPhrase();
+    }
+    
+    // Fade out 01.mp3 quand la musique générée prend le relais
+    if (audioRef.current && !audioRef.current.paused) {
+      const audio = audioRef.current;
+      let volume = audio.volume;
+      const fadeOut = setInterval(() => {
+        volume -= 0.05;
+        if (volume <= 0) {
+          clearInterval(fadeOut);
+          audio.pause();
+          audio.volume = 0.5;
+        } else {
+          audio.volume = volume;
+        }
+      }, 100);
     }
   }, [musicMode, currentBundle, isMusicLoading, introCompleted, language, languageSwitchLock]);
 
