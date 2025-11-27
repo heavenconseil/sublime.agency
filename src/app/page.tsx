@@ -12,6 +12,12 @@ import LanguageSwitcher, { Language } from "@/components/LanguageSwitcher";
 import LogoDisplay from "@/components/LogoDisplay";
 import AiPrompt from "@/components/AiPrompt";
 import PartnerLogos from "@/components/PartnerLogos";
+import ImpactMetrics from "@/components/ImpactMetrics";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 // Hooks
 import { useMusicSync } from "@/hooks/useMusicSync";
@@ -107,7 +113,11 @@ export default function Home() {
   const [textColorClass, setTextColorClass] = useState("text-white");
   const [isDarkContent, setIsDarkContent] = useState(false);
 
-  const [simParams, setSimParams] = useState({ speed: 1, softness: 1, stepsPerColor: 3 });
+  const [simParams, setSimParams] = useState(() => ({
+    speed: 0.5 + Math.random() * 1.5,        // 0.5 à 2
+    softness: 0.5 + Math.random() * 1.5,     // 0.5 à 2
+    stepsPerColor: Math.floor(2 + Math.random() * 4)  // 2 à 5
+  }));
   
   // Muted par défaut
   const [isMuted, setIsMuted] = useState(true);
@@ -128,6 +138,12 @@ export default function Home() {
   // Délai minimum de 20 secondes avant de passer au premier thème
   const [introCompleted, setIntroCompleted] = useState(false);
   
+  // Compteur d'appels API pour les métriques d'impact
+  const [apiCalls, setApiCalls] = useState(0);
+  
+  // État du drawer
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIntroCompleted(true);
@@ -147,7 +163,8 @@ export default function Home() {
     language, 
     isMuted, 
     enabled: musicMode,
-    canPlay: introCompleted // Ne jouer qu'après l'intro de 12s
+    canPlay: introCompleted, // Ne jouer qu'après l'intro de 12s
+    onApiCall: () => setApiCalls(c => c + 1)
   });
 
   // Traduction en temps réel quand la langue change
@@ -368,6 +385,7 @@ export default function Home() {
     const fetchNewTheme = async () => {
       try {
         const res = await fetch(`/api/generate-theme?lang=${language}`);
+        setApiCalls(c => c + 1); // Incrémenter le compteur
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         
@@ -431,19 +449,25 @@ export default function Home() {
         />
       </div>
 
-      {/* Main Wrapper */}
-      <div className="relative z-20 w-full h-full flex items-center justify-center">
+      {/* Main Wrapper - clic ouvre le drawer */}
+      <div 
+        className="relative z-20 w-full h-full flex items-center justify-center cursor-pointer"
+        onClick={() => setDrawerOpen(true)}
+      >
         
         {/* Background Audio - joue pendant le chargement en mode musique aussi */}
         <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
 
-        {/* Timer - delay 3s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-4 left-4 md:top-16 md:left-16 z-50">
+        {/* Timer + Impact Metrics - delay 3s */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-4 left-4 md:top-16 md:left-16 z-50" onClick={(e) => e.stopPropagation()}>
           <Timer textColorClass={textColorClass} />
+          <div className="mt-3">
+            <ImpactMetrics textColorClass={textColorClass} apiCalls={apiCalls} />
+          </div>
         </div>
 
         {/* Sound Toggle Button - delay 5s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-4 right-4 md:top-16 md:right-16 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-4 right-4 md:top-16 md:right-16 z-50" onClick={(e) => e.stopPropagation()}>
           <SoundToggle 
             isMuted={isMuted} 
             setIsMuted={setIsMuted} 
@@ -452,7 +476,7 @@ export default function Home() {
         </div>
 
         {/* Language Switcher - delay 7s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:bottom-16 md:right-16 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:bottom-16 md:right-16 z-50" onClick={(e) => e.stopPropagation()}>
           <LanguageSwitcher 
             language={language} 
             setLanguage={setLanguage} 
@@ -462,7 +486,7 @@ export default function Home() {
         </div>
 
         {/* Partner Logos - delay 9s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-16 md:left-16 z-50">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-16 md:left-16 z-50" onClick={(e) => e.stopPropagation()}>
           <PartnerLogos textColorClass={textColorClass} />
         </div>
 
@@ -473,6 +497,7 @@ export default function Home() {
             isDarkContent={isDarkContent} 
             textColorClass={textColorClass} 
             isMovedUp={false}
+            onLogoClick={() => setDrawerOpen(true)}
           />
         </div>
 
@@ -487,6 +512,38 @@ export default function Home() {
         </div>
 
       </div>
+
+      {/* Drawer déclenché par le logo */}
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <DrawerContent className="h-[35vh] w-screen bg-black/50 backdrop-blur-md border-none text-white font-mono px-[3vw]">
+          <DrawerTitle className="sr-only">Contact Sublime Agency</DrawerTitle>
+          <div className="flex flex-col items-center justify-center h-full px-8 text-center">
+            {/* Contacts en colonnes */}
+            <div className="flex flex-row gap-12 md:gap-16">
+              {/* Contact Brief */}
+              <div className="text-center">
+                <p className="text-xs opacity-70 mb-1">Vous avez un brief ?</p>
+                <p className="text-xs">Justine</p>
+                <a href="tel:+33662683126" className="text-xs">+33662683126</a>
+              </div>
+              
+              {/* Contact PR */}
+              <div className="text-center">
+                <p className="text-xs opacity-70 mb-1">Communications & PR</p>
+                <p className="text-xs">Olivier</p>
+                <a href="tel:+33764423906" className="text-xs">+33764423906</a>
+              </div>
+              
+              {/* Contact Jobs */}
+              <div className="text-center">
+                <p className="text-xs opacity-70 mb-1">Jobs</p>
+                <p className="text-xs">Thomas</p>
+                <a href="tel:+33764383478" className="text-xs">+33764383478</a>
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </main>
   );
 }

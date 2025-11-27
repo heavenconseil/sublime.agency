@@ -20,9 +20,10 @@ interface UseMusicSyncOptions {
   isMuted: boolean;
   enabled: boolean;
   canPlay?: boolean; // Attendre avant de jouer (intro)
+  onApiCall?: () => void; // Callback pour tracker les appels API
 }
 
-export function useMusicSync({ language, isMuted, enabled, canPlay = true }: UseMusicSyncOptions) {
+export function useMusicSync({ language, isMuted, enabled, canPlay = true, onApiCall }: UseMusicSyncOptions) {
   const [currentBundle, setCurrentBundle] = useState<ThemeBundle | null>(null);
   const [nextBundle, setNextBundle] = useState<ThemeBundle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +38,7 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
   const isGeneratingRef = useRef(false);
   const bundleIdCounter = useRef(0);
   const lastThemeIdRef = useRef<string | null>(null); // Pour éviter les répétitions
+  const onApiCallRef = useRef(onApiCall);
   
   // Refs pour le cleanup mémoire
   const fadeOutIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -72,6 +74,10 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
     canPlayRef.current = canPlay;
   }, [canPlay]);
 
+  useEffect(() => {
+    onApiCallRef.current = onApiCall;
+  }, [onApiCall]);
+
   // Générer un ID unique
   const generateBundleId = () => {
     bundleIdCounter.current += 1;
@@ -98,6 +104,7 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
     // Appel à l'API unifiée qui gère cache Supabase + génération temps réel
     const url = `/api/get-theme?lang=${currentLanguage}${lastId ? `&lastId=${lastId}` : ''}`;
     const response = await fetch(url);
+    onApiCallRef.current?.(); // Tracker l'appel API
     if (!response.ok) throw new Error("Failed to get theme");
     const data = await response.json();
     

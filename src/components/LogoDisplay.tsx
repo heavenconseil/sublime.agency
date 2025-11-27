@@ -10,9 +10,10 @@ interface LogoDisplayProps {
   isDarkContent: boolean;
   textColorClass: string;
   isMovedUp: boolean;
+  onLogoClick?: () => void;
 }
 
-export default function LogoDisplay({ language, isDarkContent, textColorClass, isMovedUp }: LogoDisplayProps) {
+export default function LogoDisplay({ language, isDarkContent, textColorClass, isMovedUp, onLogoClick }: LogoDisplayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // Traductions de la tagline
   const taglines: Record<Language, string> = {
@@ -58,10 +59,8 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
   return (
     <div ref={containerRef} className="relative flex flex-col items-center z-30">
        {/* Logo - apparaît en premier */}
-       <a 
-          href="https://crm.heaven.paris/sublime" 
-          target="_blank" 
-          rel="noopener noreferrer"
+       <button 
+          onClick={onLogoClick}
           className="cursor-pointer opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]"
         >
           <Image 
@@ -72,7 +71,7 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
               className={`w-48 md:w-36 transition-all duration-1000 ${isDarkContent ? '' : 'invert mix-blend-difference'}`} 
               priority
             />
-        </a>
+        </button>
         {/* Tagline - apparaît 1s après le logo */}
         <h1 className={`mt-6 text-xs font-mono text-center opacity-0 animate-[fadeInUp_1s_ease-out_1.5s_forwards] transition-colors duration-1000 ${textColorClass}`}
             style={{ opacity: 0 }}>

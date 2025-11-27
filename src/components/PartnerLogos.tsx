@@ -16,9 +16,9 @@ export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Durées d'affichage: Heaven 2/3 du temps (8s), Hopscotch 1/3 (4s)
-  const HEAVEN_DURATION = 8000;
-  const HOPSCOTCH_DURATION = 4000;
+  // Durées d'affichage: Heaven 90% (18s), Hopscotch 10% (2s)
+  const HEAVEN_DURATION = 18000;
+  const HOPSCOTCH_DURATION = 2000;
 
   const animateTransition = (from: 'hopscotch' | 'heaven', to: 'hopscotch' | 'heaven') => {
     const outgoingRef = from === 'hopscotch' ? hopscotchRef.current : heavenRef.current;
