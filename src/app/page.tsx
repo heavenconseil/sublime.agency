@@ -282,8 +282,11 @@ export default function Home() {
         hasUserInteracted.current = true;
         setIsMuted(false);
         
-        // Jouer 01.mp3 avec fade-in (en mode classique OU pendant le chargement en mode musique)
-        if (audioRef.current) {
+        // Jouer 01.mp3 avec fade-in SEULEMENT si pas de thème encore chargé
+        // (sinon useMusicSync gère la musique du thème)
+        const shouldPlayDefault = !currentBundle || !introCompleted;
+        
+        if (audioRef.current && shouldPlayDefault) {
           audioRef.current.volume = 0;
           try {
             await audioRef.current.play();
@@ -305,7 +308,7 @@ export default function Home() {
             console.log("Could not autoplay audio:", err);
           }
         }
-        // En mode musique, le hook useMusicSync gère aussi la musique générée
+        // En mode musique, le hook useMusicSync gère la musique générée
       }
     };
 
@@ -314,7 +317,7 @@ export default function Home() {
     return () => {
       document.removeEventListener('click', handleFirstClick);
     };
-  }, [isMuted]);
+  }, [isMuted, currentBundle, introCompleted]);
 
   useEffect(() => {
     const playAudio = async () => {
@@ -322,7 +325,11 @@ export default function Home() {
             audioRef.current.volume = 0.5;
             try {
                 if (!isMuted) {
-                    await audioRef.current.play();
+                    // Ne jouer 01.mp3 que si on n'a pas encore de thème généré
+                    // (sinon useMusicSync gère la musique du thème)
+                    if (!currentBundle || !introCompleted) {
+                      await audioRef.current.play();
+                    }
                 } else {
                     audioRef.current.pause();
                 }
@@ -332,7 +339,7 @@ export default function Home() {
         }
     };
     playAudio();
-  }, [isMuted]);
+  }, [isMuted, currentBundle, introCompleted]);
 
   // Mode classique (sans musique synchronisée)
   useEffect(() => {

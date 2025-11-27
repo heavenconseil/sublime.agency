@@ -8,7 +8,7 @@ export const maxDuration = 60; // Timeout pour génération temps réel
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
-const REALTIME_RATIO = 0.10; // 10% de génération temps réel
+const REALTIME_RATIO = 0.05; // 5% de génération temps réel
 const MIN_STOCK = 20; // Stock minimum avant de forcer le temps réel
 
 // Traductions des langues supportées
