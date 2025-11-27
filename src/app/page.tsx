@@ -138,7 +138,9 @@ export default function Home() {
 
   // Hook pour la musique synchronisée
   const { 
-    currentBundle, 
+    currentBundle,
+    nextBundle,
+    isNextReady,
     isLoading: isMusicLoading,
     error: musicError 
   } = useMusicSync({ 
@@ -224,20 +226,7 @@ export default function Home() {
     
     lastSyncedBundleId.current = currentBundle.id;
     
-    // Toujours synchroniser les couleurs et params visuels
-    setColors(currentBundle.colors);
-    
-    const newTextColor = getTextColor(currentBundle.colors);
-    setTextColorClass(newTextColor);
-    setIsDarkContent(newTextColor === "text-black");
-    
-    setSimParams({
-      speed: currentBundle.speed,
-      softness: currentBundle.softness,
-      stepsPerColor: currentBundle.stepsPerColor
-    });
-    
-    // Traduire la phrase si nécessaire
+    // 1. TYPEWRITER D'ABORD - démarre immédiatement
     const syncPhrase = async () => {
       if (language === 'en') {
         setPhrase(currentBundle.phrase);
@@ -264,6 +253,21 @@ export default function Home() {
       syncPhrase();
     }
     
+    // 2. COULEURS APRÈS - avec délai pour que le typewriter "commande"
+    const colorsTimeout = setTimeout(() => {
+      setColors(currentBundle.colors);
+      
+      const newTextColor = getTextColor(currentBundle.colors);
+      setTextColorClass(newTextColor);
+      setIsDarkContent(newTextColor === "text-black");
+      
+      setSimParams({
+        speed: currentBundle.speed,
+        softness: currentBundle.softness,
+        stepsPerColor: currentBundle.stepsPerColor
+      });
+    }, 1500); // 1.5s après le début du typewriter
+    
     // Fade out 01.mp3 quand la musique générée prend le relais
     if (audioRef.current && !audioRef.current.paused) {
       const audio = audioRef.current;
@@ -279,6 +283,8 @@ export default function Home() {
         }
       }, 100);
     }
+    
+    return () => clearTimeout(colorsTimeout);
   }, [musicMode, currentBundle, isMusicLoading, introCompleted, language, languageSwitchLock]);
 
   // État pour tracker si on a déjà eu une interaction utilisateur
@@ -415,13 +421,15 @@ export default function Home() {
   return (
     <main className="relative w-full h-dvh bg-white text-foreground overflow-hidden transition-colors duration-1000">
       
-      {/* Shader Background Component */}
-      <ShaderBackground
-        colors={colors}
-        speed={simParams.speed}
-        softness={simParams.softness}
-        stepsPerColor={simParams.stepsPerColor}
-      />
+      {/* Shader Background Component - fade in à l'arrivée */}
+      <div className="opacity-0 animate-[fadeIn_2s_ease-out_0.3s_forwards] absolute inset-0">
+        <ShaderBackground
+          colors={colors}
+          speed={simParams.speed}
+          softness={simParams.softness}
+          stepsPerColor={simParams.stepsPerColor}
+        />
+      </div>
 
       {/* Main Wrapper */}
       <div className="relative z-20 w-full h-full flex items-center justify-center">
@@ -458,26 +466,25 @@ export default function Home() {
           <PartnerLogos textColorClass={textColorClass} />
         </div>
 
-        {/* LOGO ZONE - avec animation d'entrée delay 0.5s */}
-        <div className="flex flex-col items-center justify-center opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">
-          
-          {/* Logo */}
+        {/* LOGO ZONE - les animations sont gérées dans le composant */}
+        <div className="flex flex-col items-center justify-center">
           <LogoDisplay 
             language={language} 
             isDarkContent={isDarkContent} 
             textColorClass={textColorClass} 
             isMovedUp={false}
           />
-          
         </div>
 
-        {/* Dynamic AI Prompt Display - positionné en bas */}
-        <AiPrompt 
-          phrase={phrase} 
-          textColorClass={textColorClass} 
-          audioRef={audioRef}
-          isMuted={isMuted}
-        />
+        {/* Dynamic AI Prompt Display - apparaît après la tagline */}
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_2.5s_forwards] absolute bottom-40 md:bottom-16 left-0 right-0">
+          <AiPrompt 
+            phrase={phrase} 
+            textColorClass={textColorClass} 
+            audioRef={audioRef}
+            isMuted={isMuted}
+          />
+        </div>
 
       </div>
     </main>

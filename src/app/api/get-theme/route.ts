@@ -26,6 +26,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const lang = searchParams.get("lang") || "en";
   const forceRealtime = searchParams.get("realtime") === "true";
+  const lastThemeId = searchParams.get("lastId") || null; // Éviter de rejouer le même
 
   try {
     // Compter le stock actuel
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
     } else {
       // Récupérer depuis le cache
       console.log("📦 Fetching cached theme...");
-      return await getCachedTheme(lang);
+      return await getCachedTheme(lang, lastThemeId);
     }
   } catch (error) {
     console.error("Error in get-theme:", error);
@@ -55,21 +56,39 @@ export async function GET(request: Request) {
 }
 
 // Récupérer un thème depuis le cache Supabase
-async function getCachedTheme(lang: string) {
-  // Récupérer un thème aléatoire parmi les moins joués
-  const { data: themes, error } = await supabase
-    .from("sublime_themes")
-    .select("*")
-    .order("play_count", { ascending: true })
-    .limit(10);
+async function getCachedTheme(lang: string, excludeId: string | null) {
+  // Construire la requête de base
+  let query = supabase.from("sublime_themes").select("*", { count: "exact", head: true });
+  
+  // Exclure le dernier thème joué
+  if (excludeId) {
+    query = query.neq("id", excludeId);
+  }
+  
+  const { count } = await query;
+  
+  if (!count || count === 0) {
+    return await generateRealtimeTheme(lang);
+  }
+  
+  // Offset aléatoire pour récupérer un thème au hasard
+  const randomOffset = Math.floor(Math.random() * count);
+  
+  let dataQuery = supabase.from("sublime_themes").select("*");
+  if (excludeId) {
+    dataQuery = dataQuery.neq("id", excludeId);
+  }
+  
+  const { data: themes, error } = await dataQuery
+    .range(randomOffset, randomOffset)
+    .limit(1);
 
   if (error || !themes || themes.length === 0) {
     // Fallback sur génération temps réel si pas de cache
     return await generateRealtimeTheme(lang);
   }
 
-  // Choisir aléatoirement parmi les 10 moins joués
-  const theme = themes[Math.floor(Math.random() * themes.length)] as Theme;
+  const theme = themes[0] as Theme;
 
   // Incrémenter le play_count
   await supabase
@@ -89,6 +108,7 @@ async function getCachedTheme(lang: string) {
     : null;
 
   return NextResponse.json({
+    themeId: theme.id, // Pour éviter de rejouer le même
     phrase,
     colors: theme.colors,
     speed: theme.speed,

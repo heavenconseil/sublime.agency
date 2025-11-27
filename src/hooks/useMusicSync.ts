@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 export interface ThemeBundle {
   id: string;
+  themeId?: string; // ID Supabase pour éviter les répétitions
   phrase: string;
   colors: string[];
   speed: number;
@@ -35,6 +36,24 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
   const canPlayRef = useRef(canPlay);
   const isGeneratingRef = useRef(false);
   const bundleIdCounter = useRef(0);
+  const lastThemeIdRef = useRef<string | null>(null); // Pour éviter les répétitions
+  
+  // Refs pour le cleanup mémoire
+  const fadeOutIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const waitingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fonction de cleanup audio propre
+  const cleanupAudio = useCallback((audio: HTMLAudioElement | null) => {
+    if (!audio) return;
+    audio.onended = null;
+    audio.onerror = null;
+    audio.pause();
+    if (audio.src && audio.src.startsWith('blob:')) {
+      URL.revokeObjectURL(audio.src);
+    }
+    audio.src = '';
+    audio.load(); // Force le déchargement
+  }, []);
 
   // Sync refs avec state
   useEffect(() => {
@@ -74,9 +93,11 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
   const generateFullBundle = useCallback(async (): Promise<ThemeBundle> => {
     const id = generateBundleId();
     const currentLanguage = languageRef.current;
+    const lastId = lastThemeIdRef.current;
     
     // Appel à l'API unifiée qui gère cache Supabase + génération temps réel
-    const response = await fetch(`/api/get-theme?lang=${currentLanguage}`);
+    const url = `/api/get-theme?lang=${currentLanguage}${lastId ? `&lastId=${lastId}` : ''}`;
+    const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to get theme");
     const data = await response.json();
     
@@ -94,8 +115,14 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
       throw new Error("No audio data received");
     }
 
+    // Mettre à jour le dernier thème ID pour éviter les répétitions
+    if (data.themeId) {
+      lastThemeIdRef.current = data.themeId;
+    }
+
     return {
       id,
+      themeId: data.themeId,
       phrase: data.phrase,
       colors: data.colors,
       speed: data.speed,
@@ -129,16 +156,32 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
   const playAndSetupTransition = useCallback((bundle: ThemeBundle) => {
     if (!bundle.audioUrl) return;
 
-    // Fade out l'ancien audio
+    // Annuler le fade out précédent si en cours
+    if (fadeOutIntervalRef.current) {
+      clearInterval(fadeOutIntervalRef.current);
+      fadeOutIntervalRef.current = null;
+    }
+
+    // Annuler l'attente précédente si en cours
+    if (waitingIntervalRef.current) {
+      clearInterval(waitingIntervalRef.current);
+      waitingIntervalRef.current = null;
+    }
+
+    // Fade out et cleanup l'ancien audio
     if (currentAudioRef.current) {
       const oldAudio = currentAudioRef.current;
+      currentAudioRef.current = null; // Détacher immédiatement
       let volume = oldAudio.volume;
-      const fadeOut = setInterval(() => {
+      
+      fadeOutIntervalRef.current = setInterval(() => {
         volume -= 0.1;
         if (volume <= 0) {
-          clearInterval(fadeOut);
-          oldAudio.pause();
-          URL.revokeObjectURL(oldAudio.src);
+          if (fadeOutIntervalRef.current) {
+            clearInterval(fadeOutIntervalRef.current);
+            fadeOutIntervalRef.current = null;
+          }
+          cleanupAudio(oldAudio);
         } else {
           oldAudio.volume = Math.max(0, volume);
         }
@@ -157,30 +200,24 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
 
     // Quand l'audio se termine, transition automatique
     audio.onended = () => {
-      console.log("Audio ended, checking for next bundle...");
       const next = nextBundleRef.current;
       
       if (next && next.status === "ready") {
-        console.log("Transitioning to:", next.phrase);
-        
-        // Mettre à jour l'état
         setCurrentBundle({ ...next, status: "playing" });
         setNextBundle(null);
         nextBundleRef.current = null;
         
-        // Jouer le nouveau bundle
         playAndSetupTransition(next);
-        
-        // Commencer à générer le suivant
         startGeneratingNext();
       } else {
-        console.log("Next bundle not ready yet, waiting...");
         // Attendre que le prochain soit prêt
-        const checkInterval = setInterval(() => {
+        waitingIntervalRef.current = setInterval(() => {
           const nextCheck = nextBundleRef.current;
           if (nextCheck && nextCheck.status === "ready") {
-            clearInterval(checkInterval);
-            console.log("Next bundle now ready, transitioning...");
+            if (waitingIntervalRef.current) {
+              clearInterval(waitingIntervalRef.current);
+              waitingIntervalRef.current = null;
+            }
             
             setCurrentBundle({ ...nextCheck, status: "playing" });
             setNextBundle(null);
@@ -192,7 +229,7 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
         }, 500);
       }
     };
-  }, [startGeneratingNext]);
+  }, [startGeneratingNext, cleanupAudio]);
 
   // Ref pour éviter la double initialisation
   const hasInitializedRef = useRef(false);
@@ -238,14 +275,19 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true }: Use
 
     return () => {
       cancelled = true;
-      if (currentAudioRef.current) {
-        currentAudioRef.current.pause();
-        if (currentAudioRef.current.src) {
-          URL.revokeObjectURL(currentAudioRef.current.src);
-        }
+      // Cleanup complet au démontage
+      if (fadeOutIntervalRef.current) {
+        clearInterval(fadeOutIntervalRef.current);
+        fadeOutIntervalRef.current = null;
       }
+      if (waitingIntervalRef.current) {
+        clearInterval(waitingIntervalRef.current);
+        waitingIntervalRef.current = null;
+      }
+      cleanupAudio(currentAudioRef.current);
+      currentAudioRef.current = null;
     };
-  }, [enabled]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [enabled, cleanupAudio]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Gérer le mute/unmute
   useEffect(() => {

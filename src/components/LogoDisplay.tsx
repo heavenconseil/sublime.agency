@@ -57,11 +57,12 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
 
   return (
     <div ref={containerRef} className="relative flex flex-col items-center z-30">
+       {/* Logo - apparaît en premier */}
        <a 
           href="https://crm.heaven.paris/sublime" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="cursor-pointer"
+          className="cursor-pointer opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]"
         >
           <Image 
               src="/sublimeV1.svg" 
@@ -72,8 +73,10 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
               priority
             />
         </a>
-        <h1 className={`mt-6 text-xs font-mono text-center opacity-50 transition-colors duration-1000 ${textColorClass}`}>
-            {taglines[language]}
+        {/* Tagline - apparaît 1s après le logo */}
+        <h1 className={`mt-6 text-xs font-mono text-center opacity-0 animate-[fadeInUp_1s_ease-out_1.5s_forwards] transition-colors duration-1000 ${textColorClass}`}
+            style={{ opacity: 0 }}>
+            <span className="opacity-50">{taglines[language]}</span>
         </h1>
     </div>
   );

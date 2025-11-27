@@ -1,9 +1,16 @@
 "use client";
 
 import { SimplexNoise } from '@paper-design/shaders-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 
 interface ShaderBackgroundProps {
+  colors: string[];
+  speed: number;
+  softness: number;
+  stepsPerColor: number;
+}
+
+interface LayerParams {
   colors: string[];
   speed: number;
   softness: number;
@@ -16,81 +23,125 @@ export default function ShaderBackground({
   softness, 
   stepsPerColor
 }: ShaderBackgroundProps) {
-  // Stocker les couleurs précédentes pour le crossfade
-  const [prevColors, setPrevColors] = useState(colors);
-  const [currentColors, setCurrentColors] = useState(colors);
-  const [crossfadeProgress, setCrossfadeProgress] = useState(1); // 1 = affiche currentColors
-  const isFirstRender = useRef(true);
+  // Système ping-pong : 2 layers fixes (A et B) qui alternent
+  // Chaque layer a ses propres params pour éviter les sauts
+  const initialParams = useMemo(() => ({ colors, speed, softness, stepsPerColor }), []);
+  
+  const [layerA, setLayerA] = useState<LayerParams>(initialParams);
+  const [layerB, setLayerB] = useState<LayerParams>(initialParams);
+  const [activeLayer, setActiveLayer] = useState<'A' | 'B'>('A');
+  const [opacity, setOpacity] = useState(1);
+  
+  const lastColorsRef = useRef(JSON.stringify(colors));
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Skip le premier rendu
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    const colorsStr = JSON.stringify(colors);
+    
+    // Skip si même couleurs
+    if (colorsStr === lastColorsRef.current) return;
+    lastColorsRef.current = colorsStr;
+
+    // Annuler l'animation précédente si en cours
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
     }
 
-    // Quand les couleurs changent, démarrer le crossfade
-    if (JSON.stringify(colors) !== JSON.stringify(currentColors)) {
-      setPrevColors(currentColors);
-      setCurrentColors(colors);
-      setCrossfadeProgress(0);
+    // Préparer le layer inactif avec TOUS les nouveaux params
+    const newParams = { colors, speed, softness, stepsPerColor };
+    const nextLayer = activeLayer === 'A' ? 'B' : 'A';
+    if (nextLayer === 'A') {
+      setLayerA(newParams);
+    } else {
+      setLayerB(newParams);
+    }
 
-      // Animer le crossfade sur 800ms
+    // Attendre un frame pour que le nouveau layer soit prêt
+    requestAnimationFrame(() => {
+      // Démarrer le crossfade
       const startTime = Date.now();
-      const duration = 2000;
+      const duration = 4000;
 
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        // Easing ease-in-out
-        const eased = progress < 0.5 
-          ? 2 * progress * progress 
-          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
         
-        setCrossfadeProgress(eased);
+        // Easing très doux des deux côtés
+        const eased = progress < 0.5
+          ? 4 * Math.pow(progress, 3)
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        setOpacity(eased);
 
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          animationRef.current = requestAnimationFrame(animate);
+        } else {
+          // Transition terminée : switcher le layer actif
+          setActiveLayer(nextLayer);
+          setOpacity(1);
+          animationRef.current = null;
         }
       };
 
-      requestAnimationFrame(animate);
-    }
-  }, [colors, currentColors]);
+      animationRef.current = requestAnimationFrame(animate);
+    });
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [colors]); // Seulement colors, pas activeLayer
+
+  const isTransitioning = opacity < 1;
 
   return (
     <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-      {/* Layer précédent (disparaît) */}
-      <div 
-        className="absolute inset-0"
-        style={{ opacity: 1 - crossfadeProgress }}
-      >
-        <SimplexNoise
-          colors={prevColors}
-          speed={speed}
-          softness={softness}
-          stepsPerColor={stepsPerColor}
-          width="100%"
-          height="100%"
-          style={{ width: '100%', height: '100%', display: 'block' }}
-        />
-      </div>
+      {/* Layer A */}
+      {(activeLayer === 'A' || isTransitioning) && (
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            opacity: activeLayer === 'A' 
+              ? (isTransitioning ? 1 - opacity * 0.5 : 1)
+              : opacity,
+            zIndex: activeLayer === 'A' ? 1 : 2
+          }}
+        >
+          <SimplexNoise
+            colors={layerA.colors}
+            speed={layerA.speed}
+            softness={layerA.softness}
+            stepsPerColor={layerA.stepsPerColor}
+            width="100%"
+            height="100%"
+            style={{ width: '100%', height: '100%', display: 'block' }}
+          />
+        </div>
+      )}
       
-      {/* Layer actuel (apparaît) */}
-      <div 
-        className="absolute inset-0"
-        style={{ opacity: crossfadeProgress }}
-      >
-        <SimplexNoise
-          colors={currentColors}
-          speed={speed}
-          softness={softness}
-          stepsPerColor={stepsPerColor}
-          width="100%"
-          height="100%"
-          style={{ width: '100%', height: '100%', display: 'block' }}
-        />
-      </div>
+      {/* Layer B */}
+      {(activeLayer === 'B' || isTransitioning) && (
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            opacity: activeLayer === 'B' 
+              ? (isTransitioning ? 1 - opacity * 0.5 : 1)
+              : opacity,
+            zIndex: activeLayer === 'B' ? 1 : 2
+          }}
+        >
+          <SimplexNoise
+            colors={layerB.colors}
+            speed={layerB.speed}
+            softness={layerB.softness}
+            stepsPerColor={layerB.stepsPerColor}
+            width="100%"
+            height="100%"
+            style={{ width: '100%', height: '100%', display: 'block' }}
+          />
+        </div>
+      )}
     </div>
   );
 }
