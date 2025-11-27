@@ -9,59 +9,66 @@ interface PartnerLogosProps {
 }
 
 export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
-  const [currentLogo, setCurrentLogo] = useState<'hopscotch' | 'heaven'>('hopscotch');
+  const [currentLogo, setCurrentLogo] = useState<'hopscotch' | 'heaven'>('heaven');
   // Refs pour chaque logo
   const hopscotchRef = useRef<HTMLImageElement>(null);
   const heavenRef = useRef<HTMLImageElement>(null);
   
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Durées d'affichage: Heaven 2/3 du temps (8s), Hopscotch 1/3 (4s)
+  const HEAVEN_DURATION = 8000;
+  const HOPSCOTCH_DURATION = 4000;
+
+  const animateTransition = (from: 'hopscotch' | 'heaven', to: 'hopscotch' | 'heaven') => {
+    const outgoingRef = from === 'hopscotch' ? hopscotchRef.current : heavenRef.current;
+    const incomingRef = to === 'hopscotch' ? hopscotchRef.current : heavenRef.current;
+
+    if (outgoingRef && incomingRef) {
+      const tl = gsap.timeline();
+
+      tl.to(outgoingRef, {
+        y: -20,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.inOut"
+      }, 0);
+
+      tl.fromTo(incomingRef, 
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.inOut"
+        }, 0.1);
+    }
+  };
+
+  const scheduleNextTransition = (current: 'hopscotch' | 'heaven') => {
+    const duration = current === 'heaven' ? HEAVEN_DURATION : HOPSCOTCH_DURATION;
+    const next = current === 'heaven' ? 'hopscotch' : 'heaven';
+
+    timeoutRef.current = setTimeout(() => {
+      animateTransition(current, next);
+      setCurrentLogo(next);
+      scheduleNextTransition(next);
+    }, duration);
+  };
 
   useEffect(() => {
-    // Initial setup
+    // Initial setup - Heaven visible au début
     if (hopscotchRef.current && heavenRef.current) {
-      // Hopscotch visible au début
-      gsap.set(hopscotchRef.current, { y: 0, opacity: 1 });
-      // Heaven caché en bas
-      gsap.set(heavenRef.current, { y: 20, opacity: 0 });
+      gsap.set(heavenRef.current, { y: 0, opacity: 1 });
+      gsap.set(hopscotchRef.current, { y: 20, opacity: 0 });
     }
 
-    intervalRef.current = setInterval(() => {
-      setCurrentLogo(prev => {
-        const next = prev === 'hopscotch' ? 'heaven' : 'hopscotch';
-        
-        const outgoingRef = prev === 'hopscotch' ? hopscotchRef.current : heavenRef.current;
-        const incomingRef = next === 'hopscotch' ? hopscotchRef.current : heavenRef.current;
-
-        if (outgoingRef && incomingRef) {
-          // Timeline pour synchroniser
-          const tl = gsap.timeline();
-
-          // 1. Le logo actuel part vers le haut
-          tl.to(outgoingRef, {
-            y: -20,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.inOut"
-          }, 0); // Démarrer à t=0
-
-          // 2. Le nouveau logo arrive du bas
-          tl.fromTo(incomingRef, 
-            { y: 20, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power3.inOut"
-            }, 0.1); // Léger décalage (0.1s) pour l'effet de chasse
-        }
-        
-        return next;
-      });
-    }, 5000);
+    // Démarrer le cycle
+    scheduleNextTransition('heaven');
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
   }, []);

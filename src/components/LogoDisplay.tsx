@@ -14,7 +14,6 @@ interface LogoDisplayProps {
 
 export default function LogoDisplay({ language, isDarkContent, textColorClass, isMovedUp }: LogoDisplayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-
   // Traductions de la tagline
   const taglines: Record<Language, string> = {
     fr: 'Studio IA Premium & Primé',
@@ -59,19 +58,19 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
   return (
     <div ref={containerRef} className="relative flex flex-col items-center z-30">
        <a 
-          href="https://crm.heaven.paris/contactus" 
+          href="https://crm.heaven.paris/sublime" 
           target="_blank" 
           rel="noopener noreferrer"
           className="cursor-pointer"
         >
           <Image 
-            src="/sublimeV1.svg" 
-            alt="Sublime Agency Logo" 
-            width={250} 
-            height={160} 
-            className={`w-48 md:w-36 transition-all duration-1000 ${isDarkContent ? '' : 'invert mix-blend-difference'}`} 
-            priority
-          />
+              src="/sublimeV1.svg" 
+              alt="Sublime Agency Logo" 
+              width={250} 
+              height={160} 
+              className={`w-48 md:w-36 transition-all duration-1000 ${isDarkContent ? '' : 'invert mix-blend-difference'}`} 
+              priority
+            />
         </a>
         <h1 className={`mt-6 text-xs font-mono text-center opacity-50 transition-colors duration-1000 ${textColorClass}`}>
             {taglines[language]}
