@@ -196,7 +196,7 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
   const displayedPhrase = useTypewriter(phrase, 60, playTypingSound, handleTypingComplete);
 
   return (
-    <div className="absolute bottom-40 md:bottom-12 left-0 right-0 flex items-center justify-center pointer-events-none">
+    <div className="absolute bottom-40 md:bottom-16 left-0 right-0 flex items-center justify-center pointer-events-none">
        <p 
          ref={paragraphRef}
          className={`font-mono text-xs text-center max-w-md transition-colors duration-1000 ${textColorClass}`}
