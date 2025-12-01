@@ -459,7 +459,7 @@ export default function Home() {
         <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
 
         {/* Timer + Impact Metrics - delay 3s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-4 left-4 md:top-16 md:left-16 z-50" onClick={(e) => e.stopPropagation()}>
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-4 left-4 md:top-8 md:left-8 z-50" onClick={(e) => e.stopPropagation()}>
           <Timer textColorClass={textColorClass} />
           <div className="mt-3">
             <ImpactMetrics textColorClass={textColorClass} apiCalls={apiCalls} />
@@ -467,7 +467,7 @@ export default function Home() {
         </div>
 
         {/* Sound Toggle Button - delay 5s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-4 right-4 md:top-16 md:right-16 z-50" onClick={(e) => e.stopPropagation()}>
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_5s_forwards] absolute top-4 right-4 md:top-8 md:right-8 z-50" onClick={(e) => e.stopPropagation()}>
           <SoundToggle 
             isMuted={isMuted} 
             setIsMuted={setIsMuted} 
@@ -476,7 +476,7 @@ export default function Home() {
         </div>
 
         {/* Language Switcher - delay 7s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:bottom-16 md:right-16 z-50" onClick={(e) => e.stopPropagation()}>
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_7s_forwards] absolute bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:bottom-8 md:right-8 z-50" onClick={(e) => e.stopPropagation()}>
           <LanguageSwitcher 
             language={language} 
             setLanguage={setLanguage} 
@@ -486,7 +486,7 @@ export default function Home() {
         </div>
 
         {/* Partner Logos - delay 9s */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-16 md:left-16 z-50" onClick={(e) => e.stopPropagation()}>
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_9s_forwards] absolute bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-8 md:left-8 z-50" onClick={(e) => e.stopPropagation()}>
           <PartnerLogos textColorClass={textColorClass} />
         </div>
 
@@ -502,7 +502,7 @@ export default function Home() {
         </div>
 
         {/* Dynamic AI Prompt Display - apparaît après la tagline */}
-        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_2.5s_forwards] absolute bottom-40 md:bottom-16 left-0 right-0">
+        <div className="opacity-0 animate-[fadeInUp_1s_ease-out_2.5s_forwards] absolute bottom-40 md:bottom-8 left-0 right-0">
           <AiPrompt 
             phrase={phrase} 
             textColorClass={textColorClass} 
