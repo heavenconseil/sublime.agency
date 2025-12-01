@@ -449,10 +449,9 @@ export default function Home() {
         />
       </div>
 
-      {/* Main Wrapper - clic ouvre le drawer */}
+      {/* Main Wrapper */}
       <div 
-        className="relative z-20 w-full h-full flex items-center justify-center cursor-pointer"
-        onClick={() => setDrawerOpen(true)}
+        className="relative z-20 w-full h-full flex items-center justify-center"
       >
         
         {/* Background Audio - joue pendant le chargement en mode musique aussi */}
@@ -516,31 +515,16 @@ export default function Home() {
       {/* Drawer déclenché par le logo */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DrawerContent className="h-[35vh] w-screen bg-black/50 backdrop-blur-md border-none text-white font-mono px-[3vw]">
-          <DrawerTitle className="sr-only">Contact Sublime Agency</DrawerTitle>
-          <div className="flex flex-col items-center justify-center h-full px-8 text-center">
-            {/* Contacts en colonnes */}
-            <div className="flex flex-row gap-12 md:gap-16">
-              {/* Contact Brief */}
-              <div className="text-center">
-                <p className="text-xs opacity-70 mb-1">Vous avez un brief ?</p>
-                <p className="text-xs">Justine</p>
-                <a href="tel:+33662683126" className="text-xs">+33662683126</a>
-              </div>
-              
-              {/* Contact PR */}
-              <div className="text-center">
-                <p className="text-xs opacity-70 mb-1">Communications & PR</p>
-                <p className="text-xs">Olivier</p>
-                <a href="tel:+33764423906" className="text-xs">+33764423906</a>
-              </div>
-              
-              {/* Contact Jobs */}
-              <div className="text-center">
-                <p className="text-xs opacity-70 mb-1">Jobs</p>
-                <p className="text-xs">Thomas</p>
-                <a href="tel:+33764383478" className="text-xs">+33764383478</a>
-              </div>
+          <DrawerTitle className="sr-only">Sublime Agency Services</DrawerTitle>
+          <div className="flex flex-col items-center justify-center h-full px-8 text-center gap-8">
+            <div className="flex flex-row gap-8 md:gap-16">
+              <p className="text-xs opacity-70">Generative Campaigns</p>
+              <p className="text-xs opacity-70">Conversational Bots</p>
+              <p className="text-xs opacity-70">AI Tools and Platforms</p>
             </div>
+            <a href="mailto:sublime@heaven.fr" className="text-xs opacity-70 hover:opacity-100 transition-opacity mt-10">
+              sublime@heaven.fr
+            </a>
           </div>
         </DrawerContent>
       </Drawer>

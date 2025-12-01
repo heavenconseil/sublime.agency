@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
 interface PartnerLogosProps {
@@ -9,11 +9,8 @@ interface PartnerLogosProps {
 }
 
 export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
-  const [currentLogo, setCurrentLogo] = useState<'hopscotch' | 'heaven'>('heaven');
-  // Refs pour chaque logo
   const hopscotchRef = useRef<HTMLImageElement>(null);
   const heavenRef = useRef<HTMLImageElement>(null);
-  
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Durées d'affichage: Heaven 90% (18s), Hopscotch 10% (2s)
@@ -51,19 +48,16 @@ export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
 
     timeoutRef.current = setTimeout(() => {
       animateTransition(current, next);
-      setCurrentLogo(next);
       scheduleNextTransition(next);
     }, duration);
   };
 
   useEffect(() => {
-    // Initial setup - Heaven visible au début
     if (hopscotchRef.current && heavenRef.current) {
       gsap.set(heavenRef.current, { y: 0, opacity: 1 });
       gsap.set(hopscotchRef.current, { y: 20, opacity: 0 });
     }
 
-    // Démarrer le cycle
     scheduleNextTransition('heaven');
 
     return () => {
@@ -74,41 +68,32 @@ export default function PartnerLogos({ textColorClass }: PartnerLogosProps) {
   }, []);
 
   return (
-    <div className="h-8 w-32 overflow-hidden flex justify-center md:justify-start">
+    <a 
+      href="https://heaven.paris" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="h-8 w-32 overflow-hidden flex justify-center md:justify-start"
+    >
       <div className="relative w-full h-full flex justify-center md:justify-start">
-        <a 
-          href="https://hopscotch.one" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="absolute top-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
-        >
-          <Image
-            ref={hopscotchRef}
-            src="/hopscotch2.png"
-            alt="Hopscotch"
-            width={80}
-            height={30}
-            className={`h-6 w-auto transition-colors duration-1000 ${textColorClass === 'text-black' ? '' : 'invert'}`}
-            priority
-          />
-        </a>
-        <a 
-          href="https://heaven.paris" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="absolute top-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
-        >
-          <Image
-            ref={heavenRef}
-            src="/heaven.png"
-            alt="Heaven"
-            width={80}
-            height={30}
-            className={`h-6 w-auto transition-colors duration-1000 ${textColorClass === 'text-black' ? '' : 'invert'}`}
-            priority
-          />
-        </a>
+        <Image
+          ref={hopscotchRef}
+          src="/hopscotch2.png"
+          alt="Hopscotch"
+          width={80}
+          height={30}
+          className={`absolute top-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 h-6 w-auto transition-colors duration-1000 ${textColorClass === 'text-black' ? '' : 'invert'}`}
+          priority
+        />
+        <Image
+          ref={heavenRef}
+          src="/heaven.png"
+          alt="Heaven"
+          width={80}
+          height={30}
+          className={`absolute top-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 h-6 w-auto transition-colors duration-1000 ${textColorClass === 'text-black' ? '' : 'invert'}`}
+          priority
+        />
       </div>
-    </div>
+    </a>
   );
 }
