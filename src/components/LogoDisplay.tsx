@@ -68,7 +68,7 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
               alt="Sublime Agency Logo" 
               width={250} 
               height={160} 
-              className={`w-48 md:w-36 transition-all duration-1000 ${isDarkContent ? '' : 'invert mix-blend-difference'}`} 
+              className={`w-28 md:w-48 transition-all duration-1000 ${isDarkContent ? '' : 'invert mix-blend-difference'}`} 
               priority
             />
         </button>
