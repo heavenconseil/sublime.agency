@@ -517,12 +517,12 @@ export default function Home() {
         <DrawerContent className="h-[35vh] w-screen bg-black/50 backdrop-blur-md border-none text-white font-mono px-[3vw]">
           <DrawerTitle className="sr-only">Sublime Agency Services</DrawerTitle>
           <div className="flex flex-col items-center justify-center h-full px-8 text-center gap-8">
-            <div className="flex flex-row gap-8 md:gap-16">
-              <p className="text-xs opacity-70">Generative Campaigns</p>
-              <p className="text-xs opacity-70">Conversational Bots</p>
-              <p className="text-xs opacity-70">AI Tools and Platforms</p>
+            <div className="grid grid-cols-3 gap-8 md:gap-16 place-items-center w-full max-w-2xl">
+              <p className="text-xs opacity-70 text-center">Generative Campaigns</p>
+              <p className="text-xs opacity-70 text-center">Conversational Bots</p>
+              <p className="text-xs opacity-70 text-center">AI Tools and Platforms</p>
             </div>
-            <a href="mailto:sublime@heaven.fr" className="text-xs opacity-70 hover:opacity-100 transition-opacity mt-10">
+            <a href="mailto:sublime@heaven.fr" className="text-xs opacity-70 hover:opacity-100 transition-opacity">
               sublime@heaven.fr
             </a>
           </div>
