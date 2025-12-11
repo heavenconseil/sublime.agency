@@ -119,14 +119,113 @@ async function getCachedTheme(lang: string, excludeId: string | null) {
   });
 }
 
+// Générer le thème directement avec OpenAI (plus de fetch HTTP interne)
+async function generateThemeWithOpenAI() {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `Tu es une IA générative visuelle et poétique. Ton rôle est de créer des concepts d'ambiance visuelle uniques et évocateurs.
+
+        Génère une phrase courte (max 8 mots) qui décrit une ambiance visuelle. The phrase must be in English.
+        
+        CATÉGORIES D'INSPIRATION (varie entre elles) :
+        
+        🌌 COSMIQUE & SCI-FI :
+        - "Sunset on Mars"
+        - "Colliding nebula"
+        - "Abandoned space station"
+        - "Aurora borealis on Titan"
+        - "Awakening black hole"
+        
+        🌊 NATURE & ÉLÉMENTS :
+        - "Silent glacial dawn"
+        - "Bamboo forest in the mist"
+        - "Electric storm over the ocean"
+        - "Salt desert at twilight"
+        - "Waterfall frozen in time"
+        
+        🏙️ URBAIN & CYBERPUNK :
+        - "Neon under the rain"
+        - "Tokyo 3am"
+        - "Ghost metro last car"
+        - "Skyscraper in the fog"
+        - "Deserted holographic alley"
+        
+        🎨 ABSTRAIT & ÉMOTIONNEL :
+        - "Liquid melancholy"
+        - "Explosion of pure joy"
+        - "Silence before the storm"
+        - "Fragmented lucid dream"
+        - "Nostalgia of a lost future"
+        
+        RÈGLES :
+        - Sois TRÈS créatif, ne répète jamais les exemples
+        - Mélange les univers de manière inattendue
+        - Évoque des sensations, pas juste des lieux
+        - Ose les associations surprenantes
+        
+        Génère une palette de 5 couleurs hexadécimales qui correspondent PARFAITEMENT à cette ambiance.
+        
+        Choisis des paramètres pour un effet visuel (Simplex Noise) :
+           - speed : entre 0.2 (très calme) et 2.0 (très agité)
+           - softness : entre 0.0 (net, tranchant) et 1.5 (très flou/vaporeux)
+           - stepsPerColor : entre 1 et 5 (complexité du dégradé)`
+      },
+      {
+        role: "user",
+        content: "Generate a new unique visual atmosphere."
+      }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "visual_theme_response",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            phrase: {
+              type: "string",
+              description: "A short poetic phrase in English describing the atmosphere."
+            },
+            colors: {
+              type: "array",
+              items: { type: "string" },
+              description: "A list of exactly 5 hexadecimal colors."
+            },
+            speed: {
+              type: "number",
+              description: "Animation speed (0.2 to 2.0)."
+            },
+            softness: {
+              type: "number",
+              description: "Noise softness (0.0 to 1.5)."
+            },
+            stepsPerColor: {
+              type: "number",
+              description: "Steps per color (1 to 5)."
+            }
+          },
+          required: ["phrase", "colors", "speed", "softness", "stepsPerColor"],
+          additionalProperties: false
+        }
+      }
+    },
+    temperature: 1,
+  });
+
+  const content = completion.choices[0].message.content;
+  if (!content) throw new Error("No content generated");
+  
+  return JSON.parse(content);
+}
+
 // Générer un nouveau thème en temps réel
 async function generateRealtimeTheme(lang: string) {
-  // 1. Générer le thème avec OpenAI (en anglais)
-  const themeResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/generate-theme?lang=en`
-  );
-  if (!themeResponse.ok) throw new Error("Failed to generate theme");
-  const theme = await themeResponse.json();
+  // 1. Générer le thème avec OpenAI (en anglais) - appel direct, pas de fetch HTTP
+  const theme = await generateThemeWithOpenAI();
 
   // 2. Générer la musique avec ElevenLabs
   console.log("🎵 Generating music for:", theme.phrase);
