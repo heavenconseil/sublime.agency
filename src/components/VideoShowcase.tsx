@@ -145,12 +145,9 @@ export default function VideoShowcase({ isOpen, onClose, textColorClass }: Video
     <div
       ref={overlayRef}
       className="fixed inset-0 z-100 flex items-center justify-center"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) handleClose();
-      }}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 backdrop-blur-2xl" />
+      {/* Backdrop — click to close */}
+      <div className="absolute inset-0 backdrop-blur-2xl cursor-pointer" onClick={handleClose} />
 
       {/* Video + controls */}
       <div className="relative z-10 flex flex-col">
