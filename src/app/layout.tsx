@@ -141,6 +141,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
+        <link rel="preload" href="/fonts/RizomaL-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="author" href="/humans.txt" />
         <script
           type="application/ld+json"

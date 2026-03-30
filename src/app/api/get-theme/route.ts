@@ -286,6 +286,7 @@ async function saveThemeToSupabase(theme: any, audioBuffer: Buffer) {
       .from("SUBLIME")
       .upload(fileName, audioBuffer, {
         contentType: "audio/mpeg",
+        cacheControl: "31536000",
         upsert: false,
       });
 

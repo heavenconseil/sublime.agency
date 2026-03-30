@@ -8,6 +8,7 @@
   src: url('/fonts/RizomaL-ExtraLight.woff2') format('woff2');
   font-weight: 200;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -15,6 +16,7 @@
   src: url('/fonts/RizomaL-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -22,6 +24,7 @@
   src: url('/fonts/RizomaL-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -29,6 +32,7 @@
   src: url('/fonts/RizomaL-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -36,6 +40,7 @@
   src: url('/fonts/RizomaL-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -43,6 +48,7 @@
   src: url('/fonts/RizomaL-Black.woff2') format('woff2');
   font-weight: 900;
   font-style: normal;
+  font-display: swap;
 }
 
 @theme inline {

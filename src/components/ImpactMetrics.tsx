@@ -64,7 +64,7 @@ export default function ImpactMetrics({ textColorClass, apiCalls }: ImpactMetric
         href="/llms.txt"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:opacity-100 transition-opacity duration-300 mt-0.5"
+        className="hover:opacity-100 transition-opacity duration-300 mt-0.5 min-h-[44px] min-w-[44px] flex items-center"
       >
         llms.txt
       </a>
@@ -72,7 +72,7 @@ export default function ImpactMetrics({ textColorClass, apiCalls }: ImpactMetric
         href="/humans.txt"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:opacity-100 transition-opacity duration-300"
+        className="hover:opacity-100 transition-opacity duration-300 min-h-[44px] min-w-[44px] flex items-center"
       >
         humans.txt
       </a>
