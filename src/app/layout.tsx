@@ -127,6 +127,11 @@ const jsonLd = {
       },
     ],
   },
+  sameAs: [
+    "https://www.youtube.com/@sublime-agency",
+    "https://www.instagram.com/sublime.heaven/",
+    "https://www.linkedin.com/company/sublime-heaven",
+  ],
   award: [
     "Grand Prix de la Creativite IA & Data 2025",
     "Best Social Media Operation — Grand Prix IA & Data 2025",
