@@ -1,7 +1,7 @@
 /* TEAM */
 
-Studio: Sublime
-Agency: heaven (Groupe Hopscotch)
+Studio: Sublime (https://sublime.agency)
+Agency: heaven (https://heaven.paris) — Groupe Hopscotch (https://hopscotch.one)
 Location: Paris, Lille, France
 Contact: sublime@heaven.fr
 
@@ -9,8 +9,8 @@ CEO: Arthur Kannas
 Creative Director: Hedy Magroun
 Head of Research: Stephane Wharton
 Engineers: Hugo Boyer, Florian Milliat
-Business Director: Kevin Caradec (kevin.caradec@heaven.fr)
-Press: Olivier Duval (olivier.duval@heaven.fr)
+Business Director: Kevin Caradec (kevin.caradec@heaven.fr) — https://www.linkedin.com/in/kevin-caradec-176108a/
+Press: Olivier Duval (olivier.duval@heaven.fr) — https://www.linkedin.com/in/olivier-duval-de-laguierce-333b3968/
 
 /* THANKS */
 
