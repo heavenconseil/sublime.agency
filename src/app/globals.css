@@ -122,6 +122,11 @@ body {
 }
 
 /* Animations d'égaliseur pour les barres de son */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 @keyframes equalizer-1 {
   0%, 100% { transform: scaleY(1); }
   50% { transform: scaleY(0.3); }
