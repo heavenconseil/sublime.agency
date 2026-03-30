@@ -7,6 +7,8 @@ const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-ibm-plex-mono",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -146,7 +148,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
-        <link rel="preload" href="/fonts/RizomaL-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/RizomaL-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" fetchPriority="high" />
         <link rel="author" href="/humans.txt" />
         <script
           type="application/ld+json"

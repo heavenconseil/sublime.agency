@@ -102,9 +102,9 @@ async function getCachedTheme(lang: string, excludeId: string | null) {
     phrase = await translatePhrase(theme.phrase_en, lang);
   }
 
-  // Construire l'URL audio depuis le bucket
+  // Construire l'URL audio via notre proxy (cache 1 an)
   const audioUrl = theme.music_path
-    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/SUBLIME/${theme.music_path}`
+    ? `/api/audio/${theme.music_path}`
     : null;
 
   return NextResponse.json({

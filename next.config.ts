@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@paper-design/shaders-react'],
+  experimental: {
+    optimizeCss: true,
+  },
   headers: async () => [
     {
       // Fonts — immutable, 1 year

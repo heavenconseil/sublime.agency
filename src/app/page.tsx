@@ -476,7 +476,7 @@ export default function Home() {
       >
         
         {/* Background Audio - joue pendant le chargement en mode musique aussi */}
-        <audio ref={audioRef} src="/sounds/01.mp3" loop preload="auto" />
+        <audio ref={audioRef} src="/sounds/01.mp3" loop preload="none" />
 
         {/* Timer + Impact Metrics - delay 3s */}
         <div className="opacity-0 animate-[fadeInUp_1s_ease-out_3s_forwards] absolute top-4 left-4 md:top-8 md:left-8 z-50" onClick={(e) => e.stopPropagation()}>
