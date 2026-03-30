@@ -1,0 +1,24 @@
+/* TEAM */
+
+Studio: Sublime
+Agency: heaven (Groupe Hopscotch)
+Location: Paris, Lille, France
+Contact: sublime@heaven.fr
+
+CEO: Arthur Kannas
+Director of Creation: Hedy Magroun
+Head of Research: Stephane Wharton
+Engineers: Hugo Boyer, Florian Milliat
+Business Director: Kevin Caradec (kevin.caradec@heaven.fr)
+Press: Olivier Duval (olivier.duval@heaven.fr)
+
+/* THANKS */
+
+Motorola, Adobe, Pantone, Saint-Gobain, LNT, and many more
+
+/* SITE */
+
+Standards: HTML5, CSS3, JavaScript
+Stack: Next.js, React, TypeScript, Tailwind CSS
+Animations: GSAP, WebGL Shaders
+AI: OpenAI, ElevenLabs

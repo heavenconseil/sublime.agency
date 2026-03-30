@@ -11,9 +11,10 @@ interface LogoDisplayProps {
   textColorClass: string;
   isMovedUp: boolean;
   onLogoClick?: () => void;
+  onShowcaseClick?: () => void;
 }
 
-export default function LogoDisplay({ language, isDarkContent, textColorClass, isMovedUp, onLogoClick }: LogoDisplayProps) {
+export default function LogoDisplay({ language, isDarkContent, textColorClass, isMovedUp, onLogoClick, onShowcaseClick }: LogoDisplayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // Traductions de la tagline
   const taglines: Record<Language, string> = {
@@ -24,6 +25,16 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
     ko: 'Premium 수상 경력의 AI 스튜디오',
     zh: 'Premium 屡获殊荣的人工智能工作室',
     ar: 'Premium استوديو الذكاء الاصطناعي الحائز على جوائز'
+  };
+
+  const showcaseLabels: Record<Language, string> = {
+    fr: 'showcase',
+    en: 'showcase',
+    es: 'showcase',
+    de: 'showcase',
+    ko: 'showcase',
+    zh: 'showcase',
+    ar: 'showcase'
   };
 
   // Animation GSAP pour déplacer le logo
@@ -77,6 +88,21 @@ export default function LogoDisplay({ language, isDarkContent, textColorClass, i
             style={{ opacity: 0 }}>
             <span className="opacity-50">{taglines[language]}</span>
         </h1>
+        {/* Showcase link - apparaît après la tagline */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const click = new Audio('/sounds/click.mp3');
+            click.play().catch(() => {});
+            onShowcaseClick?.();
+          }}
+          className={`mt-4 text-[10px] font-mono opacity-0 animate-[fadeInUp_1s_ease-out_2s_forwards] transition-colors duration-1000 cursor-pointer group ${textColorClass}`}
+          style={{ opacity: 0 }}
+        >
+          <span className="opacity-40 group-hover:opacity-80 transition-opacity duration-300 border-b border-current/20 group-hover:border-current/50 pb-0.5">
+            {showcaseLabels[language]}
+          </span>
+        </button>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import LogoDisplay from "@/components/LogoDisplay";
 import AiPrompt from "@/components/AiPrompt";
 import PartnerLogos from "@/components/PartnerLogos";
 import ImpactMetrics from "@/components/ImpactMetrics";
+import VideoShowcase from "@/components/VideoShowcase";
 import {
   Drawer,
   DrawerContent,
@@ -143,7 +144,27 @@ export default function Home() {
   
   // État du drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // État du showcase vidéo
+  const [showcaseOpen, setShowcaseOpen] = useState(false);
+  const wasMutedBeforeShowcase = useRef(false);
   
+  const handleShowcaseOpen = () => {
+    wasMutedBeforeShowcase.current = isMuted;
+    setIsMuted(true);
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+    }
+    setShowcaseOpen(true);
+  };
+
+  const handleShowcaseClose = () => {
+    setShowcaseOpen(false);
+    if (!wasMutedBeforeShowcase.current) {
+      setIsMuted(false);
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIntroCompleted(true);
@@ -491,12 +512,13 @@ export default function Home() {
 
         {/* LOGO ZONE - les animations sont gérées dans le composant */}
         <div className="flex flex-col items-center justify-center">
-          <LogoDisplay 
-            language={language} 
-            isDarkContent={isDarkContent} 
-            textColorClass={textColorClass} 
+          <LogoDisplay
+            language={language}
+            isDarkContent={isDarkContent}
+            textColorClass={textColorClass}
             isMovedUp={false}
             onLogoClick={() => setDrawerOpen(true)}
+            onShowcaseClick={handleShowcaseOpen}
           />
         </div>
 
@@ -511,6 +533,13 @@ export default function Home() {
         </div>
 
       </div>
+
+      {/* Video Showcase */}
+      <VideoShowcase
+        isOpen={showcaseOpen}
+        onClose={handleShowcaseClose}
+        textColorClass={textColorClass}
+      />
 
       {/* Drawer déclenché par le logo */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>

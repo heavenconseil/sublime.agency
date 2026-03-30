@@ -60,6 +60,22 @@ export default function ImpactMetrics({ textColorClass, apiCalls }: ImpactMetric
           <span>{ramMB.toFixed(1)}MB</span>
         </div>
       )}
+      <a
+        href="/llms.txt"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:opacity-100 transition-opacity duration-300 mt-0.5"
+      >
+        llms.txt
+      </a>
+      <a
+        href="/humans.txt"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:opacity-100 transition-opacity duration-300"
+      >
+        humans.txt
+      </a>
     </div>
   );
 }

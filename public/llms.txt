@@ -1,0 +1,45 @@
+# Sublime Agency
+
+> Premium Award-winning AI Studio
+
+## About
+
+Sublime is a 100% AI-powered creative studio by heaven (Groupe Hopscotch, France), launched after two years of internal R&D. The studio brings together a multidisciplinary team of 15+ experts — art directors, prompt engineers, developers, AI engineers, and consultants — to deliver cutting-edge AI-driven creative experiences for global brands.
+
+## Services
+
+- **Generative Campaigns**: AI-driven creative campaigns with dynamic visual and audio generation
+- **Conversational Bots**: Intelligent conversational agents tailored to brand identity
+- **AI Tools and Platforms**: Strategic AI integration and custom platforms for businesses
+
+## Leadership
+
+- **Arthur Kannas** — CEO and co-founder of heaven. Positions AI "not just as a production tool but as a new tool for expression, capable of revealing new aesthetics and new narratives."
+- **Hedy Magroun** — Director of Creation of Sublime (appointed January 2026). Industrial designer by training, digital veteran since 2000, associate at Biborg (2010), founder of Brewster Studio (2017). Creator of Kryogen.ai, a platform for AI creativity education and production. Creative Partner for Kling and Runway. Speaker and trainer on generative AI.
+
+## Awards
+
+- **Grand Prix de la Creativite IA & Data 2025** (CB News, Station F, Paris) — Grand Prix winner and Best Social Media Operation for the "Styled With Moto" campaign
+- The "Styled With Moto" campaign for Motorola has won approximately **16 awards** in France and internationally
+
+## Notable Projects
+
+### Motorola — "Styled With Moto" (2024)
+First international campaign by Sublime. A fully AI-generated fashion film for the launch of the Razr 50 and Razr 50 Ultra, in partnership with Pantone. Created over 4 months using 9 AI tools (Adobe Firefly, Midjourney, Krea.ai, Comfy UI, Hypic, Magnific.ai, ClipDrop, Luma, Udio). Featured AI-generated models wearing outfits inspired by Motorola's Batwing logo in the 6 colors of the smartphones. Covered by Marketing Dive, Branding in Asia, TrendHunter, LatinSpots, and others.
+
+### Saint-Gobain — "7 Visions of the Future" (2025)
+A campaign imagining cities of 2050, co-created with 4 AI artists (Hedy Magroun, Aurelien Pakula, Stephane Munnier, Sandramaria Schweda). Explored future urban landscapes across 7 locations worldwide. Featured an immersive master film plus 7 "Reacts" videos where Saint-Gobain experts responded to the AI-generated visions.
+
+## Sublime AI School (2026)
+
+A training program for approximately 70 interns and apprentices across heaven and the Hopscotch group. Weekly sessions from January to June 2026 covering generative technology fundamentals, copyright issues, prompt engineering, assisted writing, and collaborative project work.
+
+## Press Coverage
+
+Sublime has been covered extensively by French and international trade press including CB News, Strategies, e-marketing.fr, La Reclame, L'ADN, J'ai un pote dans la com, Marketing Dive (US), Branding in Asia, TrendHunter, LatinSpots, TopCom, and AACC.
+
+## Contact
+
+- Email: sublime@heaven.fr
+- Press: olivier.duval@heaven.fr
+- Website: https://sublime.agency
