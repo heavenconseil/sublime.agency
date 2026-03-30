@@ -8,6 +8,7 @@ Contact: sublime@heaven.fr
 CEO: Arthur Kannas
 Creative Director: Hedy Magroun
 Head of Research: Stephane Wharton
+Head of Production: Benjamin Brossier
 Lead Engineer: Florian Milliat
 Engineer: Hugo Boyer
 Business Director: Kevin Caradec (kevin.caradec@heaven.fr) — https://www.linkedin.com/in/kevin-caradec-176108a/
