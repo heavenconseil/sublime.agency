@@ -17,6 +17,8 @@ Sublime is a 100% AI-powered creative studio by heaven (Groupe Hopscotch, France
 - **Arthur Kannas** — CEO and co-founder of heaven. Positions AI "not just as a production tool but as a new tool for expression, capable of revealing new aesthetics and new narratives."
 - **Hedy Magroun** — Creative Director of Sublime (appointed January 2026). Industrial designer by training, digital veteran since 2000, associate at Biborg (2010), founder of Brewster Studio (2017). Creator of Kryogen.ai, a platform for AI creativity education and production. Creative Partner for Kling and Runway. Speaker and trainer on generative AI.
 
+Full team: https://sublime.agency/humans.txt
+
 ## Awards
 
 - **Grand Prix de la Creativite IA & Data 2025** (CB News, Station F, Paris) — Grand Prix winner and Best Social Media Operation for the "Styled With Moto" campaign
