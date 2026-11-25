@@ -14,6 +14,7 @@ import AiPrompt from "@/components/AiPrompt";
 import PartnerLogos from "@/components/PartnerLogos";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import VideoShowcase from "@/components/VideoShowcase";
+import AgencyDrawerContent from "@/components/AgencyDrawerContent";
 import {
   Drawer,
   DrawerContent,
@@ -216,7 +217,6 @@ export default function Home() {
     const loadingMessages = Object.values(LOADING_MESSAGES).flat();
     if (loadingMessages.includes(phrase)) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchro avec une donnée externe (langue, bundle)
     showTranslatedPhrase(phrase, language);
   }, [language, phrase, isMusicLoading]);
 
@@ -259,7 +259,6 @@ export default function Home() {
     const targetLang = languageRef.current;
     if (currentBundle.lang === targetLang) {
       phraseTokenRef.current++;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- synchro avec une donnée externe (langue, bundle)
       setPhrase(currentBundle.phrase);
     } else {
       showTranslatedPhrase(currentBundle.phrase, targetLang);
@@ -453,17 +452,10 @@ export default function Home() {
 
       {/* Drawer déclenché par le logo */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent className="h-[35vh] w-screen bg-black/50 backdrop-blur-md border-none text-white font-mono px-[3vw]">
-          <DrawerTitle className="sr-only">Sublime Agency Services</DrawerTitle>
-          <div className="flex flex-col items-center justify-center h-full px-8 text-center gap-8">
-            <div className="grid grid-cols-3 gap-8 md:gap-16 place-items-center w-full max-w-2xl">
-              <p className="text-xs opacity-70 text-center">Generative Campaigns</p>
-              <p className="text-xs opacity-70 text-center">Conversational Bots</p>
-              <p className="text-xs opacity-70 text-center">AI Tools and Platforms</p>
-            </div>
-            <a href="mailto:sublime@heaven.fr" className="text-xs opacity-70 hover:opacity-100 transition-opacity">
-              sublime@heaven.fr
-            </a>
+        <DrawerContent className="max-h-[85vh] w-screen bg-black/50 backdrop-blur-md border-none text-white font-mono">
+          <DrawerTitle className="sr-only">Sublime Agency</DrawerTitle>
+          <div className="overflow-y-auto">
+            <AgencyDrawerContent />
           </div>
         </DrawerContent>
       </Drawer>
