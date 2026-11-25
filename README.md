@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sublime — sublime.agency
 
-## Getting Started
+Landing page de Sublime (heaven). À chaque cycle, l'écran tire une « ambiance » au hasard : une phrase, une palette de 5 couleurs animée en shader, et une musique de 30 s.
 
-First, run the development server:
+## Fonctionnement
+
+- **Stock d'ambiances** : table Supabase `sublime_themes` (phrase en anglais, couleurs, paramètres du shader, `music_path`, `play_count`, `translations`) et bucket `SUBLIME` pour les MP3. Le stock (environ 1 075 ambiances) a été généré avec OpenAI + ElevenLabs ; il n'y a plus de génération.
+- **`GET /api/get-theme?lang=fr&lastId=<uuid>`** : tire une ambiance au hasard (hors `lastId`) via la fonction SQL `get_random_theme`, qui incrémente `play_count` dans la même requête. La phrase est traduite avec `gpt-4o-mini` puis mise en cache dans `translations`.
+- **`GET /api/audio/<fichier>.mp3`** : proxy vers le bucket Supabase, en cache CDN pendant 1 an.
+- **`POST /api/translate`** : traduit la phrase affichée quand le visiteur change de langue.
+- Langues : fr, en, es, de, ko, zh, ar.
+
+## Développement
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Variables d'environnement (`.env.local`) :
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+OPENAI_API_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # serveur uniquement : appelle get_random_theme / save_theme_translation
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Base de données
 
-## Learn More
+Les migrations sont dans `supabase/migrations/`. Pour les appliquer, colle-les dans le SQL Editor de Supabase ou lance `supabase db push`.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Déployé sur Vercel.

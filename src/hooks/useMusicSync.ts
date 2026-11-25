@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { logger } from "@/lib/logger";
 
 export interface ThemeBundle {
   id: string;
   themeId?: string; // ID Supabase pour éviter les répétitions
   phrase: string;
+  lang: string; // Langue de `phrase` au moment du fetch
   colors: string[];
   speed: number;
   softness: number;
   stepsPerColor: number;
-  audioBase64?: string;
   audioUrl?: string;
   status: "generating-theme" | "generating-music" | "ready" | "playing" | "done";
 }
@@ -50,9 +51,6 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true, onApi
     audio.onended = null;
     audio.onerror = null;
     audio.pause();
-    if (audio.src && audio.src.startsWith('blob:')) {
-      URL.revokeObjectURL(audio.src);
-    }
     audio.src = '';
     audio.load(); // Force le déchargement
   }, []);
@@ -84,43 +82,26 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true, onApi
     return `bundle-${bundleIdCounter.current}-${Date.now()}`;
   };
 
-  // Convertir base64 en URL blob
-  const base64ToAudioUrl = (base64: string): string => {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const blob = new Blob([bytes], { type: "audio/mpeg" });
-    return URL.createObjectURL(blob);
-  };
-
   // Générer un bundle complet (thème + musique) via l'API hybride
   const generateFullBundle = useCallback(async (): Promise<ThemeBundle> => {
     const id = generateBundleId();
     const currentLanguage = languageRef.current;
     const lastId = lastThemeIdRef.current;
     
-    // Appel à l'API unifiée qui gère cache Supabase + génération temps réel
+    // Thème tiré au hasard dans le stock Supabase
     const url = `/api/get-theme?lang=${currentLanguage}${lastId ? `&lastId=${lastId}` : ''}`;
     const response = await fetch(url);
     onApiCallRef.current?.(); // Tracker l'appel API
     if (!response.ok) throw new Error("Failed to get theme");
     const data = await response.json();
     
-    console.log(`Bundle ready (${data.source}):`, data.phrase);
+    logger.log("Bundle ready:", data.phrase);
 
-    // Gérer l'audio selon la source (cache = URL, realtime = base64)
-    let audioUrl: string;
-    if (data.audioUrl) {
-      // Depuis le cache Supabase
-      audioUrl = data.audioUrl;
-    } else if (data.audioBase64) {
-      // Généré en temps réel
-      audioUrl = base64ToAudioUrl(data.audioBase64);
-    } else {
+    // Audio servi depuis le stock Supabase (via /api/audio)
+    if (!data.audioUrl) {
       throw new Error("No audio data received");
     }
+    const audioUrl: string = data.audioUrl;
 
     // Mettre à jour le dernier thème ID pour éviter les répétitions
     if (data.themeId) {
@@ -131,11 +112,11 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true, onApi
       id,
       themeId: data.themeId,
       phrase: data.phrase,
+      lang: data.lang || currentLanguage,
       colors: data.colors,
       speed: data.speed,
       softness: data.softness,
       stepsPerColor: data.stepsPerColor,
-      audioBase64: data.audioBase64,
       audioUrl,
       status: "ready",
     };
@@ -147,11 +128,11 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true, onApi
     isGeneratingRef.current = true;
 
     try {
-      console.log("Starting next bundle generation...");
+      logger.log("Starting next bundle generation...");
       const bundle = await generateFullBundle();
       setNextBundle(bundle);
       nextBundleRef.current = bundle;
-      console.log("Next bundle ready!");
+      logger.log("Next bundle ready!");
     } catch (err) {
       console.error("Error generating next bundle:", err);
     } finally {
@@ -282,6 +263,8 @@ export function useMusicSync({ language, isMuted, enabled, canPlay = true, onApi
 
     return () => {
       cancelled = true;
+      // Autoriser une ré-initialisation au remontage (StrictMode en dev)
+      hasInitializedRef.current = false;
       // Cleanup complet au démontage
       if (fadeOutIntervalRef.current) {
         clearInterval(fadeOutIntervalRef.current);

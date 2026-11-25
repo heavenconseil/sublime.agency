@@ -2,8 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, useRef } from "react";
-import { gsap } from "gsap";
 import { getTextColor } from "@/utils/colors";
+import { logger } from "@/lib/logger";
 
 // Components
 import Timer from "@/components/Timer";
@@ -97,6 +97,23 @@ const LOADING_MESSAGES: Record<string, string[]> = {
   ],
 };
 
+// Traduit une phrase via l'API (renvoie la phrase d'origine en cas d'échec)
+async function translatePhrase(text: string, targetLang: string): Promise<string> {
+  try {
+    const response = await fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, targetLang }),
+    });
+    if (!response.ok) return text;
+    const { translated } = await response.json();
+    return translated || text;
+  } catch (err) {
+    logger.error("Translation error:", err);
+    return text;
+  }
+}
+
 // Import dynamique du composant ShaderBackground pour éviter les erreurs SSR
 const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), {
   ssr: false,
@@ -104,9 +121,6 @@ const ShaderBackground = dynamic(() => import('@/components/ShaderBackground'), 
 });
 
 export default function Home() {
-  // Mode musique synchronisée (activé par défaut)
-  const [musicMode, setMusicMode] = useState(true);
-  
   // États séparés
   const [phrase, setPhrase] = useState("Initialisation...");
   const [colors, setColors] = useState(["#2f2235", "#3f3244", "#60495a", "#a9aca9", "#bfc3ba"]);
@@ -127,14 +141,19 @@ export default function Home() {
   // Langue
   const [language, setLanguage] = useState<Language>('fr');
   const previousLanguageRef = useRef<Language>(language);
-  
-  const mounted = useRef(false);
-  
-  // Index pour les messages de chargement
-  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  
-  // Bloquer le switch de thème temporairement après un changement de langue
-  const [languageSwitchLock, setLanguageSwitchLock] = useState(false);
+  const languageRef = useRef<Language>(language);
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
+
+  // Jeton incrémenté à chaque nouvelle phrase : une traduction arrivée en retard
+  // n'écrase pas une phrase plus récente
+  const phraseTokenRef = useRef(0);
+  const showTranslatedPhrase = async (text: string, targetLang: string) => {
+    const token = ++phraseTokenRef.current;
+    const translated = await translatePhrase(text, targetLang);
+    if (token === phraseTokenRef.current) setPhrase(translated);
+  };
   
   // Délai minimum de 20 secondes avant de passer au premier thème
   const [introCompleted, setIntroCompleted] = useState(false);
@@ -174,138 +193,94 @@ export default function Home() {
   }, []);
 
   // Hook pour la musique synchronisée
-  const { 
+  const {
     currentBundle,
-    nextBundle,
-    isNextReady,
     isLoading: isMusicLoading,
-    error: musicError 
-  } = useMusicSync({ 
-    language, 
-    isMuted, 
-    enabled: musicMode,
+  } = useMusicSync({
+    language,
+    isMuted,
+    enabled: true,
     canPlay: introCompleted, // Ne jouer qu'après l'intro de 12s
     onApiCall: () => setApiCalls(c => c + 1)
   });
 
-  // Traduction en temps réel quand la langue change
+  // Traduction de la phrase affichée quand la langue change
   useEffect(() => {
     const prevLang = previousLanguageRef.current;
     previousLanguageRef.current = language;
-    
-    // Ne pas traduire si c'est le premier render ou si on est en loading
+
+    // Ne pas traduire si la langue n'a pas changé ou si on est en loading
     if (prevLang === language || isMusicLoading) return;
-    
+
     // Ne pas traduire les messages de chargement
     const loadingMessages = Object.values(LOADING_MESSAGES).flat();
     if (loadingMessages.includes(phrase)) return;
-    
-    // Bloquer le switch de thème pendant 5 secondes pour laisser le typewriter finir
-    setLanguageSwitchLock(true);
-    const unlockTimer = setTimeout(() => {
-      setLanguageSwitchLock(false);
-    }, 5000);
-    
-    // Traduire la phrase actuelle
-    const translateCurrentPhrase = async () => {
-      try {
-        const response = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: phrase, targetLang: language }),
-        });
-        if (response.ok) {
-          const { translated } = await response.json();
-          setPhrase(translated);
-        }
-      } catch (err) {
-        console.error("Translation error:", err);
-      }
-    };
-    
-    translateCurrentPhrase();
-    
-    return () => clearTimeout(unlockTimer);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchro avec une donnée externe (langue, bundle)
+    showTranslatedPhrase(phrase, language);
   }, [language, phrase, isMusicLoading]);
-  
+
   // Cycler les messages de chargement pendant l'intro (12 premières secondes)
   useEffect(() => {
     // Continuer tant que l'intro n'est pas terminée
-    if (!musicMode || introCompleted) return;
+    if (introCompleted) return;
     
     const messages = LOADING_MESSAGES[language] || LOADING_MESSAGES['fr'];
     
     // Afficher le premier message
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchro avec une donnée externe (langue, bundle)
     setPhrase(messages[0]);
     
+    let index = 0;
     const interval = setInterval(() => {
-      setLoadingMessageIndex(prev => {
-        const next = (prev + 1) % messages.length;
-        setPhrase(messages[next]);
-        return next;
-      });
+      index = (index + 1) % messages.length;
+      setPhrase(messages[index]);
     }, 3000);
-    
+
     return () => clearInterval(interval);
-  }, [musicMode, introCompleted, language]);
+  }, [introCompleted, language]);
 
   // Ref pour tracker le dernier bundle synchronisé
   const lastSyncedBundleId = useRef<string | null>(null);
+  const colorsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Synchroniser les états quand on est en mode musique et qu'un bundle est prêt
+  useEffect(() => () => {
+    if (colorsTimeoutRef.current) clearTimeout(colorsTimeoutRef.current);
+  }, []);
+
+  // Synchroniser l'affichage quand un nouveau bundle est prêt
   useEffect(() => {
-    if (!musicMode || !currentBundle || isMusicLoading || !introCompleted) return;
-    
-    // Éviter de re-sync le même bundle (sauf si la langue a changé)
-    const isNewBundle = lastSyncedBundleId.current !== currentBundle.id;
-    const needsTranslation = isNewBundle || !languageSwitchLock;
-    
-    if (!isNewBundle && languageSwitchLock) return;
-    
+    if (!currentBundle || isMusicLoading || !introCompleted) return;
+    if (lastSyncedBundleId.current === currentBundle.id) return;
     lastSyncedBundleId.current = currentBundle.id;
-    
-    // 1. TYPEWRITER D'ABORD - démarre immédiatement
-    const syncPhrase = async () => {
-      if (language === 'en') {
-        setPhrase(currentBundle.phrase);
-      } else {
-        try {
-          const response = await fetch("/api/translate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: currentBundle.phrase, targetLang: language }),
-          });
-          if (response.ok) {
-            const { translated } = await response.json();
-            setPhrase(translated);
-          } else {
-            setPhrase(currentBundle.phrase);
-          }
-        } catch {
-          setPhrase(currentBundle.phrase);
-        }
-      }
-    };
-    
-    if (needsTranslation) {
-      syncPhrase();
+
+    // 1. TYPEWRITER D'ABORD — la phrase arrive déjà traduite par l'API ;
+    //    on ne retraduit que si la langue a changé pendant le chargement
+    const targetLang = languageRef.current;
+    if (currentBundle.lang === targetLang) {
+      phraseTokenRef.current++;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- synchro avec une donnée externe (langue, bundle)
+      setPhrase(currentBundle.phrase);
+    } else {
+      showTranslatedPhrase(currentBundle.phrase, targetLang);
     }
-    
+
     // 2. COULEURS APRÈS - avec délai pour que le typewriter "commande"
-    const colorsTimeout = setTimeout(() => {
+    if (colorsTimeoutRef.current) clearTimeout(colorsTimeoutRef.current);
+    colorsTimeoutRef.current = setTimeout(() => {
       setColors(currentBundle.colors);
-      
+
       const newTextColor = getTextColor(currentBundle.colors);
       setTextColorClass(newTextColor);
       setIsDarkContent(newTextColor === "text-black");
-      
+
       setSimParams({
         speed: currentBundle.speed,
         softness: currentBundle.softness,
         stepsPerColor: currentBundle.stepsPerColor
       });
     }, 1500); // 1.5s après le début du typewriter
-    
+
     // Fade out 01.mp3 quand la musique générée prend le relais
     if (audioRef.current && !audioRef.current.paused) {
       const audio = audioRef.current;
@@ -321,9 +296,7 @@ export default function Home() {
         }
       }, 100);
     }
-    
-    return () => clearTimeout(colorsTimeout);
-  }, [musicMode, currentBundle, isMusicLoading, introCompleted, language, languageSwitchLock]);
+  }, [currentBundle, isMusicLoading, introCompleted]);
 
   // État pour tracker si on a déjà eu une interaction utilisateur
   const hasUserInteracted = useRef(false);
@@ -358,7 +331,7 @@ export default function Home() {
               }
             }, 50);
           } catch (err) {
-            console.log("Could not autoplay audio:", err);
+            logger.log("Could not autoplay audio:", err);
           }
         }
         // En mode musique, le hook useMusicSync gère la musique générée
@@ -387,75 +360,12 @@ export default function Home() {
                     audioRef.current.pause();
                 }
             } catch (err) {
-                console.log("Audio playback error:", err);
+                logger.log("Audio playback error:", err);
             }
         }
     };
     playAudio();
   }, [isMuted, currentBundle, introCompleted]);
-
-  // Mode classique (sans musique synchronisée)
-  useEffect(() => {
-    // Si on est en mode musique, ne pas lancer les fetches classiques
-    if (musicMode) return;
-    
-    mounted.current = true;
-    let colorTimeout: NodeJS.Timeout;
-    let interval: NodeJS.Timeout;
-
-    const fetchNewTheme = async () => {
-      try {
-        const res = await fetch(`/api/generate-theme?lang=${language}`);
-        setApiCalls(c => c + 1); // Incrémenter le compteur
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        
-        if (mounted.current) {
-            // 1. Lance l'écriture de la nouvelle phrase
-            setPhrase(data.phrase);
-
-            // 2. Calcule la durée de l'écriture pour changer les couleurs à la fin
-            const typingDuration = data.phrase.length * 60; // 60ms par char
-            
-            // Nettoyer le timeout précédent s'il existe
-            if (colorTimeout) clearTimeout(colorTimeout);
-
-            colorTimeout = setTimeout(() => {
-                if (mounted.current) {
-                    // Le crossfade est géré par ShaderBackground
-                    setColors(data.colors);
-                    
-                    // Calculer la nouvelle couleur de texte
-                    const newTextColor = getTextColor(data.colors);
-                    setTextColorClass(newTextColor);
-                    setIsDarkContent(newTextColor === "text-black");
-
-                    setSimParams({
-                        speed: data.speed,
-                        softness: data.softness,
-                        stepsPerColor: data.stepsPerColor
-                    });
-                }
-            }, typingDuration + 200); // +200ms de pause après la fin
-        }
-      } catch (error) {
-        console.error("Error fetching theme:", error);
-      }
-    };
-
-    // Premier appel rapide après 2s
-    const initialTimer = setTimeout(fetchNewTheme, 2000);
-
-    // Ensuite toutes les 12 secondes
-    interval = setInterval(fetchNewTheme, 12000);
-
-    return () => {
-        mounted.current = false;
-        clearTimeout(initialTimer);
-        clearInterval(interval);
-        if (colorTimeout) clearTimeout(colorTimeout);
-    };
-  }, [language, musicMode]); // Re-fetch si la langue change ou si on quitte le mode musique
 
   return (
     <main className="relative w-full h-dvh bg-white text-foreground overflow-hidden transition-colors duration-1000">

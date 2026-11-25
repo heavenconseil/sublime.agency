@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { useTypewriter } from "@/hooks/useTypewriter";
+import { logger } from "@/lib/logger";
 
 interface AiPromptProps {
   phrase: string;
@@ -44,24 +45,24 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
     });
     
     audio.addEventListener('loadstart', () => {
-      console.log('🔄 Début du chargement du son de typing...');
+      logger.log('🔄 Début du chargement du son de typing...');
     });
     
     audio.addEventListener('canplay', () => {
-      console.log('✅ Son de typing prêt à être joué');
+      logger.log('✅ Son de typing prêt à être joué');
     });
     
     audio.addEventListener('canplaythrough', () => {
-      console.log('✅ Son de typing complètement chargé');
+      logger.log('✅ Son de typing complètement chargé');
     });
     
     audio.addEventListener('play', () => {
-      console.log('▶️ Son de typing démarré');
+      logger.log('▶️ Son de typing démarré');
       isPlayingRef.current = true;
     });
     
     audio.addEventListener('pause', () => {
-      console.log('⏸️ Son de typing arrêté');
+      logger.log('⏸️ Son de typing arrêté');
       isPlayingRef.current = false;
     });
     
@@ -73,7 +74,9 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
       // Cleanup : arrêter et libérer le son quand le composant est démonté
       if (typingAudioRef.current) {
         typingAudioRef.current.pause();
-        typingAudioRef.current.src = '';
+        // removeAttribute + load libère le son sans déclencher l'événement 'error'
+        typingAudioRef.current.removeAttribute('src');
+        typingAudioRef.current.load();
       }
     };
   }, []);
@@ -95,9 +98,9 @@ export default function AiPrompt({ phrase, textColorClass, audioRef, isMuted }: 
         // Attendre un peu que le son soit prêt
         if (typingAudioRef.current.readyState >= 2) {
           try {
-            console.log('🎵 Démarrage du son de typing...');
+            logger.log('🎵 Démarrage du son de typing...');
             await typingAudioRef.current.play();
-            console.log('✅ Son de typing joué avec succès');
+            logger.log('✅ Son de typing joué avec succès');
           } catch (err) {
             console.error("❌ Impossible de jouer le son de typing:", err);
             // Essayer de charger à nouveau
